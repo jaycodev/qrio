@@ -7,6 +7,7 @@ import { DataTableRowActions } from '@admin/components/data-table/data-table-row
 
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
+import type { OrderFilterOptionsParams } from '@/lib/schemas/order/order.filter.options.schema'
 import type { OrderList } from '@/lib/schemas/order/order.list.schema'
 import { withMetaLabelFilter } from '@/lib/utils/components/with-meta-label-filter'
 import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-header'
@@ -14,7 +15,9 @@ import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-head
 import { statusBadges } from './badges'
 import { statusOptions } from './filter-options'
 
-export const getColumns = (): ColumnDef<OrderList>[] => {
+export const getColumns = (options?: OrderFilterOptionsParams): ColumnDef<OrderList>[] => {
+  const { tables: tablesOptions = [], customers: customersOptions = [] } = options ?? {}
+
   return [
     {
       id: 'select',
@@ -41,27 +44,44 @@ export const getColumns = (): ColumnDef<OrderList>[] => {
       enableHiding: false,
     },
     {
-      accessorKey: 'table',
+      id: 'table',
+      accessorFn: (row) => String(row.table.id),
       header: withMetaLabelHeader<OrderList>(),
-      cell: ({ getValue }) => {
-        const table = getValue<{ id: number; number: number }>()
+      cell: ({ row }) => {
+        const number = row.original.table.number
         return (
           <Badge variant="outline">
             <Hash className="mr-1" />
-            Mesa {table.number}
+            Mesa {number}
           </Badge>
         )
       },
+      enableSorting: false,
+      meta: withMetaLabelFilter<OrderList>({
+        columnId: 'table',
+        options: tablesOptions,
+      }),
+      filterFn: (row, id, value) => {
+        return value.includes(row.getValue(id))
+      },
     },
     {
-      accessorKey: 'customer',
+      id: 'customer',
+      accessorFn: (row) => String(row.customer.id),
       header: withMetaLabelHeader<OrderList>(),
-      cell: ({ getValue }) => {
-        const customer = getValue<{ id: number; name: string }>()
-        return <span>{customer.name}</span>
+      cell: ({ row }) => {
+        const name = row.original.customer.name
+        return <span>{name}</span>
       },
       meta: {
         searchable: true,
+        ...withMetaLabelFilter<OrderList>({
+          columnId: 'customer',
+          options: customersOptions,
+        }),
+      },
+      filterFn: (row, id, value) => {
+        return value.includes(row.getValue(id))
       },
     },
     {
