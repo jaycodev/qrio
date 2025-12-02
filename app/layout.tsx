@@ -4,6 +4,9 @@ import { ThemeProvider } from 'next-themes'
 import NextTopLoader from 'nextjs-toploader'
 
 import { ThemeScript } from '@/components/shared/theme-script'
+import { Toaster } from '@/components/ui/sonner'
+
+import { QueryProvider } from './providers/query-provider'
 
 import './globals.css'
 
@@ -15,13 +18,13 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Next.js + shadcn/ui Starter',
+  title: {
+    default: 'Qrio',
+    template: '%s - Qrio',
+  },
   description: 'Starter template with Next.js 15, Tailwind CSS v4, and shadcn/ui.',
   icons: {
-    icon: [
-      { url: '/favicon-light.svg', media: '(prefers-color-scheme: light)', type: 'image/svg+xml' },
-      { url: '/favicon-dark.svg', media: '(prefers-color-scheme: dark)', type: 'image/svg+xml' },
-    ],
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
   },
 }
 
@@ -42,15 +45,18 @@ export default function RootLayout({
         <ThemeScript />
       </head>
       <body className={`${inter.className} antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          disableTransitionOnChange
-          enableColorScheme
-        >
-          <NextTopLoader color="var(--primary)" height={2} easing="linear" showSpinner={false} />
-          {children}
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            disableTransitionOnChange
+            enableColorScheme
+          >
+            <NextTopLoader color="var(--primary)" height={2} easing="linear" showSpinner={false} />
+            <Toaster duration={5000} />
+            {children}
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   )

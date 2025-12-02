@@ -18,7 +18,7 @@ export function ThemeToggle() {
 
   return (
     <Button
-      variant="outline"
+      variant="ghost"
       size="icon"
       className="rounded-full relative [&>svg]:!transition-all"
       onClick={() => setTheme(resolvedTheme === 'light' ? 'dark' : 'light')}
