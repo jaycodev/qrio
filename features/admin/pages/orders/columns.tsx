@@ -1,7 +1,7 @@
 'use client'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { HandPlatter, Hash, Users, UtensilsCrossed } from 'lucide-react'
+import { HandPlatter, Hash, User, Users, UtensilsCrossed } from 'lucide-react'
 
 import { DataTableRowActions } from '@admin/components/data-table/data-table-row-actions'
 
@@ -79,6 +79,20 @@ export const getColumns = (options?: OrderFilterOptionsParams): ColumnDef<OrderL
       }),
       filterFn: (row, id, value) => {
         return value.includes(row.getValue(id))
+      },
+    },
+    {
+      id: 'customerCode',
+      accessorFn: (row) => String(row.customer.code),
+      header: withMetaLabelHeader<OrderList>(),
+      cell: ({ getValue }) => {
+        const code = getValue<string>()
+        return (
+          <Badge variant="outline" className="font-mono">
+            <User className="mr-1" />
+            {code}
+          </Badge>
+        )
       },
     },
     {

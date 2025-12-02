@@ -9,6 +9,7 @@ export const columnLabelsByResource: Record<string, Record<string, string>> = {
   orders: {
     code: 'Código',
     table: 'N° Mesa',
+    customerCode: 'Cód. cliente',
     customer: 'Cliente',
     status: 'Estado',
     total: 'Total',

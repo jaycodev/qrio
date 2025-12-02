@@ -11,6 +11,7 @@ export const orderListSchema = z.object({
   }),
   customer: z.object({
     id: z.number(),
+    code: z.string(),
     name: z.string(),
   }),
   status: OrderStatus,
