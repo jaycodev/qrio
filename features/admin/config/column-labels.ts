@@ -7,6 +7,7 @@ export const columnLabelsByResource: Record<string, Record<string, string>> = {
     status: 'Estado',
   },
   orders: {
+    code: 'Código',
     table: 'N° Mesa',
     customer: 'Cliente',
     status: 'Estado',
