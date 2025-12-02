@@ -6,15 +6,17 @@ import { type OrderList, orderListSchema } from '@/lib/schemas/order/order.list.
 
 import { apiClient } from './client'
 
+const resource = '/orders'
+
 export const ordersApi = {
   async getAll(restaurantId: number, branchId?: number): Promise<OrderList[]> {
     const query = `restaurantId=${restaurantId}${branchId ? `&branchId=${branchId}` : ''}`
-    const data = await apiClient.get(`/orders?${query}`)
+    const data = await apiClient.get(`${resource}?${query}`)
     return orderListSchema.array().parse(data)
   },
 
   async getFilterOptions(branchId: number): Promise<OrderFilterOptions> {
-    const data = await apiClient.get(`/orders/filter-options?branchId=${branchId}`)
+    const data = await apiClient.get(`${resource}/filter-options?branchId=${branchId}`)
     return orderFilterOptionsSchema.parse(data)
   },
 }
