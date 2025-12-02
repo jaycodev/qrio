@@ -4,6 +4,7 @@ import { OrderStatus } from './order.enums'
 
 export const orderListSchema = z.object({
   id: z.number(),
+  code: z.string(),
   table: z.object({
     id: z.number(),
     number: z.number(),

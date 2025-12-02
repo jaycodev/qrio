@@ -1,7 +1,7 @@
 'use client'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { Hash, Users, UtensilsCrossed } from 'lucide-react'
+import { HandPlatter, Hash, Users, UtensilsCrossed } from 'lucide-react'
 
 import { DataTableRowActions } from '@admin/components/data-table/data-table-row-actions'
 
@@ -44,6 +44,22 @@ export const getColumns = (options?: OrderFilterOptionsParams): ColumnDef<OrderL
       enableHiding: false,
     },
     {
+      accessorKey: 'code',
+      header: withMetaLabelHeader<OrderList>(),
+      cell: ({ getValue }) => {
+        const code = getValue<string>()
+        return (
+          <Badge variant="outline" className="font-mono">
+            <HandPlatter className="mr-1" />
+            {code}
+          </Badge>
+        )
+      },
+      meta: {
+        searchable: true,
+      },
+    },
+    {
       id: 'table',
       accessorFn: (row) => String(row.table.id),
       header: withMetaLabelHeader<OrderList>(),
@@ -74,7 +90,6 @@ export const getColumns = (options?: OrderFilterOptionsParams): ColumnDef<OrderL
         return <span>{name}</span>
       },
       meta: {
-        searchable: true,
         ...withMetaLabelFilter<OrderList>({
           columnId: 'customer',
           options: customersOptions,
