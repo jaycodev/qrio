@@ -8,6 +8,12 @@ type PageMeta = {
 export const pageMap: Record<string, PageMeta> = {
   '/admin': { title: 'Dashboard', authOnly: true, showInSidebar: true },
 
+  '/admin/productos': {
+    title: 'Productos',
+    authOnly: true,
+    showInSidebar: true,
+    resource: 'products',
+  },
   '/admin/pedidos': {
     title: 'Pedidos',
     authOnly: true,
@@ -19,12 +25,6 @@ export const pageMap: Record<string, PageMeta> = {
     authOnly: true,
     showInSidebar: true,
     resource: 'tables',
-  },
-  '/admin/menu': {
-    title: 'Menú',
-    authOnly: true,
-    showInSidebar: true,
-    resource: 'dishes',
   },
   '/admin/ofertas': {
     title: 'Ofertas',
