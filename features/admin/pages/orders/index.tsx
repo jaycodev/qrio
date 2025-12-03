@@ -19,9 +19,7 @@ interface Props {
 }
 
 export function OrdersPage({ title, pathname, resource }: Props) {
-  const { data, error } = useListQuery<OrderList[]>(pathname, [resource], () =>
-    ordersApi.getAll(1, 1)
-  )
+  const { data, error } = useListQuery<OrderList[]>(pathname, [resource], () => ordersApi.getAll(1))
   const { data: filterOptions } = useFilterOptions<OrderFilterOptions>(
     ['orders-filter-options'],
     () => ordersApi.getFilterOptions(1)

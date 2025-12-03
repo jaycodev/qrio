@@ -9,9 +9,8 @@ import { apiClient } from './client'
 const resource = '/orders'
 
 export const ordersApi = {
-  async getAll(restaurantId: number, branchId?: number): Promise<OrderList[]> {
-    const query = `restaurantId=${restaurantId}${branchId ? `&branchId=${branchId}` : ''}`
-    const data = await apiClient.get(`${resource}?${query}`)
+  async getAll(branchId: number): Promise<OrderList[]> {
+    const data = await apiClient.get(`${resource}?branchId=${branchId}`)
     return orderListSchema.array().parse(data)
   },
 
