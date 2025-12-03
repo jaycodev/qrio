@@ -1,7 +1,7 @@
 'use client'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { HandPlatter, Hash, User, Users, UtensilsCrossed } from 'lucide-react'
+import { HandPlatter, Table2, User, Users, UtensilsCrossed } from 'lucide-react'
 
 import { DataTableRowActions } from '@admin/components/data-table/data-table-row-actions'
 
@@ -67,7 +67,7 @@ export const getColumns = (options?: OrderFilterOptionsParams): ColumnDef<OrderL
         const number = row.original.table.number
         return (
           <Badge variant="outline">
-            <Hash className="mr-1" />
+            <Table2 className="mr-1" />
             Mesa {number}
           </Badge>
         )
