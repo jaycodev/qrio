@@ -1,3 +1,5 @@
+import { AudioWaveform, ChefHat, GalleryVerticalEnd } from 'lucide-react'
+
 import { pageMap, type ValidUrl } from '@/config/page-map'
 
 import { sidebarMap } from './sidebar-map'
@@ -21,6 +23,23 @@ export const sidebarData = {
     email: 'jason.vilac@gmail.com',
     avatar: '',
   },
+  teams: [
+    {
+      logo: ChefHat,
+      restaurant: 'Restaurante',
+      branch: 'Sucursal',
+    },
+    {
+      logo: GalleryVerticalEnd,
+      restaurant: 'Restaurante',
+      branch: 'Sucursal',
+    },
+    {
+      logo: AudioWaveform,
+      restaurant: 'Restaurante',
+      branch: 'Sucursal',
+    },
+  ],
   navGroups: [
     {
       title: 'Inicio',
