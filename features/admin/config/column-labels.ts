@@ -16,6 +16,12 @@ export const columnLabelsByResource: Record<string, Record<string, string>> = {
     people: 'N° Personas',
     itemCount: 'Ítems',
   },
+  tables: {
+    id: 'ID',
+    tableNumber: 'N° Mesa',
+    floor: 'Piso',
+    qrCode: 'Cód. QR',
+  },
 }
 
 export function getColumnLabel(resource: string | undefined, columnId: string): string {
