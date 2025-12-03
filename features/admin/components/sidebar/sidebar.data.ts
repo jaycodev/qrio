@@ -31,12 +31,12 @@ export const sidebarData = {
     },
     {
       logo: GalleryVerticalEnd,
-      restaurant: 'Restaurante',
+      restaurant: 'Restaurante 2',
       branch: 'Sucursal',
     },
     {
       logo: AudioWaveform,
-      restaurant: 'Restaurante',
+      restaurant: 'Restaurante 3',
       branch: 'Sucursal',
     },
   ],
