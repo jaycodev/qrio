@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   description: 'Starter template with Next.js 15, Tailwind CSS v4, and shadcn/ui.',
   icons: {
-    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    icon: [{ url: '/icons/favicon.svg', type: 'image/svg+xml' }],
   },
 }
 
