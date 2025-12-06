@@ -1,17 +1,18 @@
 'use client'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { DollarSign, Package, PoundSterling, Tag, TagIcon, Mail, Calendar } from 'lucide-react'
+import { Calendar, DollarSign, Mail, Package, PoundSterling, Tag, TagIcon } from 'lucide-react'
 
 import { DataTableRowActions } from '@admin/components/data-table/data-table-row-actions'
 
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-header'
-import { statusBadges } from '../customers/badges'
-import { withMetaLabelFilter } from '@/lib/utils/components/with-meta-label-filter'
-import { statusOptions } from '../customers/filter-options'
 import { CustomerList } from '@/lib/schemas/customers/customers.list.schema'
+import { withMetaLabelFilter } from '@/lib/utils/components/with-meta-label-filter'
+import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-header'
+
+import { statusBadges } from '../customers/badges'
+import { statusOptions } from '../customers/filter-options'
 
 export const getColumns = (): ColumnDef<CustomerList>[] => {
   return [

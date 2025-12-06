@@ -2,17 +2,18 @@
 
 import type { ColumnDef } from '@tanstack/react-table'
 import { DollarSign, HandPlatter, Package, PoundSterling, Tag, TagIcon } from 'lucide-react'
+import { title } from 'process'
 
 import { DataTableRowActions } from '@admin/components/data-table/data-table-row-actions'
 
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-header'
-import { statusBadges } from '../products/badged'
-import { withMetaLabelFilter } from '@/lib/utils/components/with-meta-label-filter'
-import { statusOptions } from '../offers/filter-options'
 import { OfferList } from '@/lib/schemas/offers/offers.list.schema'
-import { title } from 'process'
+import { withMetaLabelFilter } from '@/lib/utils/components/with-meta-label-filter'
+import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-header'
+
+import { statusOptions } from '../offers/filter-options'
+import { statusBadges } from '../products/badged'
 
 export const getColumns = (): ColumnDef<OfferList>[] => {
   return [

@@ -5,10 +5,10 @@ import { useMemo } from 'react'
 import { TableListLayout } from '@admin/components/shared/table-list-layout'
 
 import { useListQuery } from '@/hooks/use-list-query'
+import { offersApi } from '@/lib/api/offers'
 import type { OfferList } from '@/lib/schemas/offers/offers.list.schema'
 
 import { getColumns } from './columns'
-import { offersApi } from '@/lib/api/offers'
 
 interface Props {
   title: string

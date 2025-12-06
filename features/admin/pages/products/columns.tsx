@@ -8,9 +8,10 @@ import { DataTableRowActions } from '@admin/components/data-table/data-table-row
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { Category, ProductList } from '@/lib/schemas/products/product.list.schema'
-import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-header'
-import { statusBadges } from '../products/badged'
 import { withMetaLabelFilter } from '@/lib/utils/components/with-meta-label-filter'
+import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-header'
+
+import { statusBadges } from '../products/badged'
 import { statusOptions } from '../products/filter-options'
 
 export const getColumns = (): ColumnDef<ProductList>[] => {

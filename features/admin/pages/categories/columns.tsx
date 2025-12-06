@@ -7,10 +7,9 @@ import { DataTableRowActions } from '@admin/components/data-table/data-table-row
 
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-
-import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-header'
-import { categorySchema, CategoryList } from '@/lib/schemas/categories/category.list.schema'
+import { CategoryList, categorySchema } from '@/lib/schemas/categories/category.list.schema'
 import { Category } from '@/lib/types/categorie'
+import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-header'
 
 export const getColumns = (): ColumnDef<CategoryList>[] => {
   return [

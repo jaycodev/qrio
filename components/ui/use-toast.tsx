@@ -1,4 +1,5 @@
 import * as React from 'react'
+
 import { type ToastProps } from './toast' // Necesita importar los tipos del componente toast.tsx
 
 const TOAST_LIMIT = 1

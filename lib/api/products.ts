@@ -1,4 +1,3 @@
-import { type ProductList, productListSchema } from '@/lib/schemas/products/product.list.schema'
 import {
   type ProductCreate,
   productCreateSchema,
@@ -7,6 +6,7 @@ import {
   type ProductDetail,
   productDetailSchema,
 } from '@/lib/schemas/products/product.detail.schema'
+import { type ProductList, productListSchema } from '@/lib/schemas/products/product.list.schema'
 
 import { apiClient } from './client'
 
