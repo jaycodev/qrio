@@ -14,6 +14,12 @@ export const pageMap: Record<string, PageMeta> = {
     showInSidebar: true,
     resource: 'products',
   },
+  '/admin/categorias': {
+    title: 'Categorías',
+    authOnly: true,
+    showInSidebar: true,
+    resource: 'categories',
+  },
   '/admin/pedidos': {
     title: 'Pedidos',
     authOnly: true,

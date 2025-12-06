@@ -1,6 +1,7 @@
 import {
   ChartColumnBig,
   CircleQuestionMark,
+  Folder,
   HandPlatter,
   Percent,
   Settings,
@@ -27,6 +28,7 @@ const setSidebar = <T extends ValidUrl>(url: T, meta: SidebarVisualMeta) => {
 setSidebar('/admin', { icon: ChartColumnBig, group: 'inicio' })
 
 setSidebar('/admin/productos', { icon: Utensils, group: 'principal' })
+setSidebar('/admin/categorias', { icon: Folder, group: 'principal' })
 setSidebar('/admin/pedidos', { icon: HandPlatter, group: 'principal' })
 setSidebar('/admin/mesas', { icon: Table2, group: 'principal' })
 setSidebar('/admin/ofertas', { icon: Percent, group: 'principal' })
