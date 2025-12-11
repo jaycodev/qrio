@@ -90,9 +90,7 @@ export const getColumns = (
     },
     {
       id: 'actions',
-      cell: ({ row }) => (
-        <DataTableRowActions row={row.original} onEdit={onEdit} onDetails={onDetails} />
-      ),
+      cell: ({ row }) => <DataTableRowActions row={row} onEdit={onEdit} onDetails={onDetails} />,
     },
   ]
 }

@@ -140,7 +140,12 @@ export function ProductDialog({
                 <FormItem>
                   <FormLabel>Descripción</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Descripción" {...field} disabled={readOnly} />
+                    <Textarea
+                      placeholder="Descripción"
+                      {...field}
+                      value={field.value ?? ''}
+                      disabled={readOnly}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -175,7 +180,12 @@ export function ProductDialog({
                 <FormItem>
                   <FormLabel>Imagen (URL)</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://..." {...field} disabled={readOnly} />
+                    <Input
+                      placeholder="https://..."
+                      {...field}
+                      value={field.value ?? ''}
+                      disabled={readOnly}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
