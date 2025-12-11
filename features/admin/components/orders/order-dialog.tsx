@@ -1,17 +1,24 @@
 'use client'
 
 import * as React from 'react'
+
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Select } from '@/components/ui/select'
 import { ComboBox } from '@/components/ui/combobox'
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/select'
 import { ordersApi } from '@/lib/api/orders'
 import { productsApi } from '@/lib/api/products'
 
@@ -19,7 +26,15 @@ const orderSchema = z.object({
   customerId: z.number().int().positive(),
   people: z.number().int().positive(),
   status: z.string().min(1),
-  items: z.array(z.object({ productId: z.number().int().positive(), quantity: z.number().int().positive(), unitPrice: z.number().nonnegative() })).min(1),
+  items: z
+    .array(
+      z.object({
+        productId: z.number().int().positive(),
+        quantity: z.number().int().positive(),
+        unitPrice: z.number().nonnegative(),
+      })
+    )
+    .min(1),
 })
 
 type OrderFormValues = z.infer<typeof orderSchema>
@@ -34,7 +49,15 @@ interface OrderDialogProps {
   onSubmit: (values: OrderFormValues, id?: number) => Promise<void>
 }
 
-export function OrderDialog({ open, mode, initialValues, tables = [], customers = [], onClose, onSubmit }: OrderDialogProps) {
+export function OrderDialog({
+  open,
+  mode,
+  initialValues,
+  tables = [],
+  customers = [],
+  onClose,
+  onSubmit,
+}: OrderDialogProps) {
   const form = useForm<OrderFormValues>({
     resolver: zodResolver(orderSchema),
     defaultValues: {
@@ -55,8 +78,7 @@ export function OrderDialog({ open, mode, initialValues, tables = [], customers 
     productsApi
       .getAll(1)
       .then((products) => {
-        if (mounted)
-          setCatalog(products.map((p) => ({ id: p.id, name: p.name, price: p.price })))
+        if (mounted) setCatalog(products.map((p) => ({ id: p.id, name: p.name, price: p.price })))
       })
       .finally(() => mounted && setLoadingProducts(false))
     return () => {
@@ -79,7 +101,10 @@ export function OrderDialog({ open, mode, initialValues, tables = [], customers 
   }
 
   const removeItem = (productId: number) => {
-    form.setValue('items', form.getValues('items').filter((i) => i.productId !== productId))
+    form.setValue(
+      'items',
+      form.getValues('items').filter((i) => i.productId !== productId)
+    )
   }
 
   const handleSubmit = async (values: OrderFormValues) => {
@@ -99,7 +124,11 @@ export function OrderDialog({ open, mode, initialValues, tables = [], customers 
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>
-            {mode === 'create' ? 'Agregar Pedido' : mode === 'edit' ? 'Editar Pedido' : 'Detalle de Pedido'}
+            {mode === 'create'
+              ? 'Agregar Pedido'
+              : mode === 'edit'
+                ? 'Editar Pedido'
+                : 'Detalle de Pedido'}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
@@ -131,7 +160,13 @@ export function OrderDialog({ open, mode, initialValues, tables = [], customers 
                 <FormItem>
                   <FormLabel>Personas</FormLabel>
                   <FormControl>
-                    <Input type="number" min={1} value={field.value as number} onChange={(e) => field.onChange(Number(e.target.value))} disabled={readOnly} />
+                    <Input
+                      type="number"
+                      min={1}
+                      value={field.value as number}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={readOnly}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -170,7 +205,13 @@ export function OrderDialog({ open, mode, initialValues, tables = [], customers 
                   <span>Cargando productos...</span>
                 ) : (
                   catalog.map((p) => (
-                    <Button key={p.id} type="button" variant="outline" onClick={() => addItem(p.id)} disabled={readOnly}>
+                    <Button
+                      key={p.id}
+                      type="button"
+                      variant="outline"
+                      onClick={() => addItem(p.id)}
+                      disabled={readOnly}
+                    >
                       + {p.name}
                     </Button>
                   ))
@@ -179,7 +220,9 @@ export function OrderDialog({ open, mode, initialValues, tables = [], customers 
               <div className="space-y-2">
                 {form.getValues('items').map((item) => (
                   <div key={item.productId} className="flex items-center gap-2">
-                    <span className="w-48 truncate">{catalog.find((c) => c.id === item.productId)?.name}</span>
+                    <span className="w-48 truncate">
+                      {catalog.find((c) => c.id === item.productId)?.name}
+                    </span>
                     <Input
                       type="number"
                       min={1}
@@ -188,7 +231,12 @@ export function OrderDialog({ open, mode, initialValues, tables = [], customers 
                       className="w-24"
                       disabled={readOnly}
                     />
-                    <Button type="button" variant="destructive" onClick={() => removeItem(item.productId)} disabled={readOnly}>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      onClick={() => removeItem(item.productId)}
+                      disabled={readOnly}
+                    >
                       Quitar
                     </Button>
                   </div>

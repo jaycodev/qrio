@@ -16,7 +16,7 @@ import { statusOptions } from '../customers/filter-options'
 
 export const getColumns = (
   onEdit?: (row: CustomerList) => void,
-  onDetails?: (row: CustomerList) => void,
+  onDetails?: (row: CustomerList) => void
 ): ColumnDef<CustomerList>[] => {
   return [
     {
@@ -151,11 +151,7 @@ export const getColumns = (
     {
       id: 'actions',
       cell: ({ row }) => (
-        <DataTableRowActions
-          row={row.original}
-          onEdit={onEdit}
-          onDetails={onDetails}
-        />
+        <DataTableRowActions row={row.original} onEdit={onEdit} onDetails={onDetails} />
       ),
     },
   ]

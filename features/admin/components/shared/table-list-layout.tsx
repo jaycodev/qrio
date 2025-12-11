@@ -84,8 +84,7 @@ export function TableListLayout<TData, TValue>({
               {isLoading ? <Spinner /> : <FileSpreadsheet className="text-destructive" />}
               PDF
             </Button>
-            <Button disabled={isLoading} onClick={onAdd}
-            >
+            <Button disabled={isLoading} onClick={onAdd}>
               {isLoading ? <Spinner /> : <CirclePlus />}
               Agregar
             </Button>

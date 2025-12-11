@@ -1,18 +1,28 @@
 'use client'
 
 import * as React from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+
+import { Button } from '@/components/ui/button'
+import { ComboBox } from '@/components/ui/combobox'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { ComboBox } from '@/components/ui/combobox'
-import { Button } from '@/components/ui/button'
-
 import { categoriesApi } from '@/lib/api/categories'
-import { productCreateSchema, type ProductCreate } from '@/lib/schemas/products/product.create.schema'
+import {
+  type ProductCreate,
+  productCreateSchema,
+} from '@/lib/schemas/products/product.create.schema'
 
 interface CategoryOption {
   id: number
@@ -27,11 +37,17 @@ interface ProductDialogProps {
   onSubmit: (values: ProductCreate, id?: number) => Promise<void>
 }
 
-export function ProductDialog({ open, mode, initialValues, onClose, onSubmit }: ProductDialogProps) {
+export function ProductDialog({
+  open,
+  mode,
+  initialValues,
+  onClose,
+  onSubmit,
+}: ProductDialogProps) {
   const form = useForm<ProductCreate>({
     resolver: zodResolver(productCreateSchema),
     defaultValues: {
-      categoryId: initialValues?.categoryId ?? undefined as unknown as number,
+      categoryId: initialValues?.categoryId ?? (undefined as unknown as number),
       name: initialValues?.name ?? '',
       description: initialValues?.description ?? '',
       price: (initialValues?.price as number) ?? (undefined as unknown as number),
@@ -74,7 +90,11 @@ export function ProductDialog({ open, mode, initialValues, onClose, onSubmit }: 
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {mode === 'create' ? 'Agregar Producto' : mode === 'edit' ? 'Editar Producto' : 'Detalle de Producto'}
+            {mode === 'create'
+              ? 'Agregar Producto'
+              : mode === 'edit'
+                ? 'Editar Producto'
+                : 'Detalle de Producto'}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>

@@ -2,13 +2,14 @@
 
 import { useMemo, useState } from 'react'
 
-import { TableListLayout } from '@admin/components/shared/table-list-layout'
+import { useQueryClient } from '@tanstack/react-query'
+
 import { OfferDialog } from '@admin/components/offers/offer-dialog'
+import { TableListLayout } from '@admin/components/shared/table-list-layout'
 
 import { useListQuery } from '@/hooks/use-list-query'
 import { offersApi } from '@/lib/api/offers'
 import type { OfferList } from '@/lib/schemas/offers/offers.list.schema'
-import { useQueryClient } from '@tanstack/react-query'
 
 import { getColumns } from './columns'
 
@@ -65,14 +66,18 @@ export function OffersPage({ title, pathname, resource }: Props) {
       <OfferDialog
         open={showDialog}
         mode={dialogMode}
-        initialValues={selected ? {
-          id: selected.id,
-          title: selected.title,
-          description: selected.description,
-          offerDiscountPercentage: selected.offerDiscountPercentage,
-          active: selected.active,
-          products: [],
-        } : undefined}
+        initialValues={
+          selected
+            ? {
+                id: selected.id,
+                title: selected.title,
+                description: selected.description,
+                offerDiscountPercentage: selected.offerDiscountPercentage,
+                active: selected.active,
+                products: [],
+              }
+            : undefined
+        }
         onClose={() => setShowDialog(false)}
         onSubmit={async (values, id) => {
           if (dialogMode === 'create') {

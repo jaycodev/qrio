@@ -1,10 +1,18 @@
 'use client'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { useForm } from 'react-hook-form'
+
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import type { DiningTableList } from '@/lib/schemas/table/table.list.schema'
 
 type Mode = 'create' | 'edit' | 'details'
@@ -20,7 +28,8 @@ interface Props {
 
 export function TableDialog({ open, mode, initial, onClose, onSubmitCreate, onSubmitEdit }: Props) {
   const readOnly = mode === 'details'
-  const title = mode === 'create' ? 'Agregar Mesa' : mode === 'edit' ? 'Editar Mesa' : 'Detalle de Mesa'
+  const title =
+    mode === 'create' ? 'Agregar Mesa' : mode === 'edit' ? 'Editar Mesa' : 'Detalle de Mesa'
 
   const form = useForm<{ tableNumber: number; floor: number }>({
     defaultValues: {
@@ -80,7 +89,9 @@ export function TableDialog({ open, mode, initial, onClose, onSubmitCreate, onSu
               )}
             />
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={onClose}>Cerrar</Button>
+              <Button type="button" variant="outline" onClick={onClose}>
+                Cerrar
+              </Button>
               {mode !== 'details' && <Button type="submit">Guardar</Button>}
             </div>
           </form>

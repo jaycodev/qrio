@@ -1,17 +1,24 @@
 'use client'
 
 import * as React from 'react'
+
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { productsApi } from '@/lib/api/products'
 
 const offerSchema = z.object({
@@ -19,7 +26,11 @@ const offerSchema = z.object({
   description: z.string().optional(),
   offerDiscountPercentage: z.number().min(0),
   active: z.boolean(),
-  products: z.array(z.object({ productId: z.number().int().positive(), quantity: z.number().int().positive() })).min(1, 'Seleccione al menos un producto'),
+  products: z
+    .array(
+      z.object({ productId: z.number().int().positive(), quantity: z.number().int().positive() })
+    )
+    .min(1, 'Seleccione al menos un producto'),
 })
 
 type OfferFormValues = z.infer<typeof offerSchema>
@@ -71,12 +82,17 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
   const updateQuantity = (productId: number, qty: number) => {
     form.setValue(
       'products',
-      form.getValues('products').map((p) => (p.productId === productId ? { ...p, quantity: qty } : p))
+      form
+        .getValues('products')
+        .map((p) => (p.productId === productId ? { ...p, quantity: qty } : p))
     )
   }
 
   const removeProduct = (productId: number) => {
-    form.setValue('products', form.getValues('products').filter((p) => p.productId !== productId))
+    form.setValue(
+      'products',
+      form.getValues('products').filter((p) => p.productId !== productId)
+    )
   }
 
   const handleSubmit = async (values: OfferFormValues) => {
@@ -96,7 +112,11 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>
-            {mode === 'create' ? 'Agregar Oferta' : mode === 'edit' ? 'Editar Oferta' : 'Detalle de Oferta'}
+            {mode === 'create'
+              ? 'Agregar Oferta'
+              : mode === 'edit'
+                ? 'Editar Oferta'
+                : 'Detalle de Oferta'}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
@@ -136,7 +156,13 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
                 <FormItem>
                   <FormLabel>Descuento (%)</FormLabel>
                   <FormControl>
-                    <Input type="number" step="0.01" value={field.value as number} onChange={(e) => field.onChange(Number(e.target.value))} disabled={readOnly} />
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={field.value as number}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={readOnly}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -150,7 +176,11 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
                 <FormItem>
                   <FormLabel>Activo</FormLabel>
                   <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={(v) => field.onChange(!!v)} disabled={readOnly} />
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={(v) => field.onChange(!!v)}
+                      disabled={readOnly}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -164,7 +194,13 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
                   <span>Cargando productos...</span>
                 ) : (
                   catalog.map((p) => (
-                    <Button key={p.id} type="button" variant="outline" onClick={() => addProduct(p.id)} disabled={readOnly}>
+                    <Button
+                      key={p.id}
+                      type="button"
+                      variant="outline"
+                      onClick={() => addProduct(p.id)}
+                      disabled={readOnly}
+                    >
                       + {p.name}
                     </Button>
                   ))
@@ -173,7 +209,9 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
               <div className="space-y-2">
                 {form.getValues('products').map((item) => (
                   <div key={item.productId} className="flex items-center gap-2">
-                    <span className="w-48 truncate">{catalog.find((c) => c.id === item.productId)?.name}</span>
+                    <span className="w-48 truncate">
+                      {catalog.find((c) => c.id === item.productId)?.name}
+                    </span>
                     <Input
                       type="number"
                       min={1}
@@ -182,7 +220,12 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
                       className="w-24"
                       disabled={readOnly}
                     />
-                    <Button type="button" variant="destructive" onClick={() => removeProduct(item.productId)} disabled={readOnly}>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      onClick={() => removeProduct(item.productId)}
+                      disabled={readOnly}
+                    >
                       Quitar
                     </Button>
                   </div>
