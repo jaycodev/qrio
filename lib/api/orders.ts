@@ -18,4 +18,26 @@ export const ordersApi = {
     const data = await apiClient.get(`${resource}/filter-options?branchId=${branchId}`)
     return orderFilterOptionsSchema.parse(data)
   },
+
+  async create(payload: {
+    customerId: number
+    people: number
+    items: { productId: number; quantity: number; unitPrice: number }[]
+  }): Promise<OrderList> {
+    const data = await apiClient.post(`${resource}`, payload)
+    return orderListSchema.parse(data)
+  },
+
+  async update(
+    id: number,
+    payload: {
+      customerId: number
+      status: string
+      people: number
+      items: { productId: number; quantity: number; unitPrice: number }[]
+    }
+  ): Promise<OrderList> {
+    const data = await apiClient.put(`${resource}/${id}`, payload)
+    return orderListSchema.parse(data)
+  },
 }

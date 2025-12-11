@@ -1,6 +1,6 @@
 'use client'
 
-import type { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef, Row } from '@tanstack/react-table'
 import { DollarSign, Package, PoundSterling, Tag, TagIcon } from 'lucide-react'
 
 import { DataTableRowActions } from '@admin/components/data-table/data-table-row-actions'
@@ -14,7 +14,10 @@ import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-head
 import { statusBadges } from '../products/badged'
 import { statusOptions } from '../products/filter-options'
 
-export const getColumns = (): ColumnDef<ProductList>[] => {
+export const getColumns = (
+  onEdit?: (product: ProductList) => void,
+  onDetails?: (product: ProductList) => void
+): ColumnDef<ProductList>[] => {
   return [
     {
       id: 'select',
@@ -126,7 +129,9 @@ export const getColumns = (): ColumnDef<ProductList>[] => {
     },
     {
       id: 'actions',
-      cell: () => <DataTableRowActions />,
+      cell: ({ row }: { row: Row<ProductList> }) => (
+        <DataTableRowActions row={row} onEdit={onEdit} onDetails={onDetails} />
+      ),
     },
   ]
 }

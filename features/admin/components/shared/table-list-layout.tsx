@@ -20,6 +20,7 @@ interface TableListLayoutProps<TData, TValue> {
   pathname: string
   filterCount?: number
   dateRangeCount?: number
+  onAdd?: () => void
 }
 
 function getFilterCount<TData, TValue>(
@@ -53,6 +54,7 @@ export function TableListLayout<TData, TValue>({
   pathname,
   filterCount,
   dateRangeCount,
+  onAdd,
 }: TableListLayoutProps<TData, TValue>) {
   const computedFilterCount = getFilterCount(columns, filterCount)
   const computedDateRangeCount = getDateRangeCount(columns, dateRangeCount)
@@ -82,7 +84,7 @@ export function TableListLayout<TData, TValue>({
               {isLoading ? <Spinner /> : <FileSpreadsheet className="text-destructive" />}
               PDF
             </Button>
-            <Button disabled={isLoading}>
+            <Button disabled={isLoading} onClick={onAdd}>
               {isLoading ? <Spinner /> : <CirclePlus />}
               Agregar
             </Button>

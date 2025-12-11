@@ -1,6 +1,6 @@
 'use client'
 
-import type { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef, Row } from '@tanstack/react-table'
 import { HandPlatter, Table2, User, Users, UtensilsCrossed } from 'lucide-react'
 
 import { DataTableRowActions } from '@admin/components/data-table/data-table-row-actions'
@@ -15,7 +15,11 @@ import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-head
 import { statusBadges } from './badges'
 import { statusOptions } from './filter-options'
 
-export const getColumns = (options?: OrderFilterOptionsParams): ColumnDef<OrderList>[] => {
+export const getColumns = (
+  options?: OrderFilterOptionsParams,
+  onEdit?: (order: OrderList) => void,
+  onDetails?: (order: OrderList) => void
+): ColumnDef<OrderList>[] => {
   const { tables: tablesOptions = [], customers: customersOptions = [] } = options ?? {}
 
   return [
@@ -189,7 +193,9 @@ export const getColumns = (options?: OrderFilterOptionsParams): ColumnDef<OrderL
     },
     {
       id: 'actions',
-      cell: () => <DataTableRowActions />,
+      cell: ({ row }: { row: Row<OrderList> }) => (
+        <DataTableRowActions row={row} onEdit={onEdit} onDetails={onDetails} />
+      ),
     },
   ]
 }

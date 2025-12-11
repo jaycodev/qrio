@@ -21,12 +21,15 @@ export class ApiClient {
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`
+    const devToken = process.env.NEXT_PUBLIC_DEV_ACCESS_TOKEN
 
     const res = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
+        ...(devToken ? { Authorization: `Bearer ${devToken}` } : {}),
         ...options.headers,
       },
+      credentials: 'include',
       ...options,
     })
 

@@ -10,7 +10,10 @@ import { Checkbox } from '@/components/ui/checkbox'
 import type { DiningTableList } from '@/lib/schemas/table/table.list.schema'
 import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-header'
 
-export const getColumns = (): ColumnDef<DiningTableList>[] => {
+export const getColumns = (
+  onEdit?: (row: DiningTableList) => void,
+  onDetails?: (row: DiningTableList) => void
+): ColumnDef<DiningTableList>[] => {
   return [
     {
       id: 'select',
@@ -87,7 +90,7 @@ export const getColumns = (): ColumnDef<DiningTableList>[] => {
     },
     {
       id: 'actions',
-      cell: () => <DataTableRowActions />,
+      cell: ({ row }) => <DataTableRowActions row={row} onEdit={onEdit} onDetails={onDetails} />,
     },
   ]
 }

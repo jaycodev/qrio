@@ -9,4 +9,8 @@ export const categoriesApi = {
     const data = await apiClient.get(`${resource}?restaurantId=${restaurantId}`)
     return categorySchema.array().parse(data)
   },
+  async create(body: { name: string }): Promise<CategoryList> {
+    const data = await apiClient.post(resource, body)
+    return categorySchema.parse(data)
+  },
 }
