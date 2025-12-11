@@ -3,7 +3,6 @@ import * as React from 'react'
 import { type ToastProps } from './toast' // Necesita importar los tipos del componente toast.tsx
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000 // Puedes ajustar esto
 
 type ToasActionType = {
   type: 'ADD_TOAST' | 'UPDATE_TOAST' | 'DISMISS_TOAST' | 'REMOVE_TOAST'

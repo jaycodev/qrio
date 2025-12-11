@@ -1,7 +1,5 @@
 import { z } from 'zod'
 
-import { CustomerStatus } from './customers.enums'
-
 export const customerListSchema = z.object({
   id: z.number(),
   name: z.string(),

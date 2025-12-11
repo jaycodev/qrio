@@ -1,8 +1,4 @@
 import {
-  CustomerFilterOptions,
-  customersFilterOptionsSchema,
-} from '@/lib/schemas/customers/customers.filter.options.schema'
-import {
   type CustomerList,
   customerListSchema,
 } from '@/lib/schemas/customers/customers.list.schema'
