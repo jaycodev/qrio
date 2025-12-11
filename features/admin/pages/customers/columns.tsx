@@ -14,7 +14,10 @@ import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-head
 import { statusBadges } from '../customers/badges'
 import { statusOptions } from '../customers/filter-options'
 
-export const getColumns = (): ColumnDef<CustomerList>[] => {
+export const getColumns = (
+  onEdit?: (row: CustomerList) => void,
+  onDetails?: (row: CustomerList) => void,
+): ColumnDef<CustomerList>[] => {
   return [
     {
       id: 'select',
@@ -147,7 +150,13 @@ export const getColumns = (): ColumnDef<CustomerList>[] => {
     },
     {
       id: 'actions',
-      cell: () => <DataTableRowActions />,
+      cell: ({ row }) => (
+        <DataTableRowActions
+          row={row.original}
+          onEdit={onEdit}
+          onDetails={onDetails}
+        />
+      ),
     },
   ]
 }

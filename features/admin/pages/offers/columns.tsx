@@ -1,6 +1,6 @@
 'use client'
 
-import type { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef, Row } from '@tanstack/react-table'
 import { DollarSign, HandPlatter, Package, PoundSterling, Tag, TagIcon } from 'lucide-react'
 import { title } from 'process'
 
@@ -15,7 +15,10 @@ import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-head
 import { statusOptions } from '../offers/filter-options'
 import { statusBadges } from '../products/badged'
 
-export const getColumns = (): ColumnDef<OfferList>[] => {
+export const getColumns = (
+  onEdit?: (offer: OfferList) => void,
+  onDetails?: (offer: OfferList) => void
+): ColumnDef<OfferList>[] => {
   return [
     {
       id: 'select',
@@ -136,7 +139,9 @@ export const getColumns = (): ColumnDef<OfferList>[] => {
     },
     {
       id: 'actions',
-      cell: () => <DataTableRowActions />,
+      cell: ({ row }: { row: Row<OfferList> }) => (
+        <DataTableRowActions row={row} onEdit={onEdit} onDetails={onDetails} />
+      ),
     },
   ]
 }

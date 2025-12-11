@@ -1,5 +1,4 @@
-import { Ellipsis } from 'lucide-react'
-import { Info, Pencil } from 'lucide-react'
+import { Ellipsis, Info, Pencil } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -8,8 +7,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import type { Row } from '@tanstack/react-table'
 
-export function DataTableRowActions() {
+interface Props<TData> {
+  row: Row<TData>
+  onEdit?: (data: TData) => void
+  onDetails?: (data: TData) => void
+}
+
+export function DataTableRowActions<TData>({ row, onEdit, onDetails }: Props<TData>) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -22,11 +28,11 @@ export function DataTableRowActions() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onDetails?.(row.original)}>
           <Info />
           Detalles
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onEdit?.(row.original)}>
           <Pencil />
           Editar
         </DropdownMenuItem>

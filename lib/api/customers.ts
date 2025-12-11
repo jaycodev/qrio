@@ -16,4 +16,8 @@ export const customerApi = {
     const data = await apiClient.get(`${resource}?branchId=${branchId}`)
     return customerListSchema.array().parse(data)
   },
+  async create(payload: { name: string; email: string }): Promise<CustomerList> {
+    const data = await apiClient.post(resource, payload)
+    return customerListSchema.parse(data)
+  },
 }
