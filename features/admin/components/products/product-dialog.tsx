@@ -4,7 +4,7 @@ import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -31,10 +31,10 @@ export function ProductDialog({ open, mode, initialValues, onClose, onSubmit }: 
   const form = useForm<ProductCreate>({
     resolver: zodResolver(productCreateSchema),
     defaultValues: {
-      categoryId: initialValues?.categoryId ?? undefined as unknown as number,
+      categoryId: initialValues?.categoryId ?? (undefined as unknown as number),
       name: initialValues?.name ?? '',
       description: initialValues?.description ?? '',
-      price: (initialValues?.price as number) ?? (undefined as unknown as number),
+      price: (initialValues?.price as number) ?? 0,
       imageUrl: (initialValues?.imageUrl as string) ?? '',
     },
   })
@@ -76,6 +76,13 @@ export function ProductDialog({ open, mode, initialValues, onClose, onSubmit }: 
           <DialogTitle>
             {mode === 'create' ? 'Agregar Producto' : mode === 'edit' ? 'Editar Producto' : 'Detalle de Producto'}
           </DialogTitle>
+          <DialogDescription>
+            {mode === 'create'
+              ? 'Completa los campos para registrar un nuevo producto.'
+              : mode === 'edit'
+              ? 'Actualiza la información del producto seleccionado.'
+              : 'Visualiza la información del producto.'}
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
@@ -138,7 +145,7 @@ export function ProductDialog({ open, mode, initialValues, onClose, onSubmit }: 
                       type="number"
                       step="0.01"
                       placeholder="0.00"
-                      value={field.value as number}
+                      value={typeof field.value === 'number' ? field.value : 0}
                       onChange={(e) => field.onChange(Number(e.target.value))}
                       disabled={readOnly}
                     />
