@@ -2,16 +2,12 @@
 
 import * as React from 'react'
 
-<<<<<<< HEAD
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
-=======
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
 import { Button } from '@/components/ui/button'
 import { ComboBox } from '@/components/ui/combobox'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -20,7 +16,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
->>>>>>> 17c98e5c335f8369eda719d60fdc44c7a62d456c
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { categoriesApi } from '@/lib/api/categories'
