@@ -10,16 +10,15 @@ export const metadata: Metadata = {
 }
 
 export default async function Page() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("access_token");
+  const cookieStore = await cookies()
+  const token = cookieStore.get('access_token')
   if (token?.value) {
-    redirect("/admin");
+    redirect('/admin')
   }
   return (
     <>
       <RedirectIfCookie />
       <LoginPage />
     </>
-  );
+  )
 }
-

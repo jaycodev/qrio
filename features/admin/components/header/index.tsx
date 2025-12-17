@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { Cloud, LogOut } from 'lucide-react'
 
@@ -68,7 +68,13 @@ export function Header() {
             </a>
           </Button>
           <ThemeToggle />
-          <Button variant="ghost" size="icon" className="rounded-full" onClick={handleLogout} aria-label="Salir">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            onClick={handleLogout}
+            aria-label="Salir"
+          >
             <LogOut />
           </Button>
         </div>

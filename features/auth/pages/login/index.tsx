@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -65,7 +65,14 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
               </div>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input id="email" name="email" type="email" placeholder="m@example.com" autoComplete="username" required />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  autoComplete="username"
+                  required
+                />
               </Field>
               <Field>
                 <div className="flex items-center">
@@ -74,10 +81,18 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
                     Forgot your password?
                   </Link>
                 </div>
-                  <Input id="password" name="password" type="password" autoComplete="current-password" required />
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                />
               </Field>
               <Field>
-                <Button type="submit" disabled={loading}>{loading ? 'Ingresando...' : 'Login'}</Button>
+                <Button type="submit" disabled={loading}>
+                  {loading ? 'Ingresando...' : 'Login'}
+                </Button>
                 {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">

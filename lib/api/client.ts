@@ -40,13 +40,13 @@ export class ApiClient {
 
     const makeRequest = async () =>
       fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...(devToken ? { Authorization: `Bearer ${devToken}` } : {}),
-        ...options.headers,
-      },
-      credentials: 'include',
-      ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(devToken ? { Authorization: `Bearer ${devToken}` } : {}),
+          ...options.headers,
+        },
+        credentials: 'include',
+        ...options,
       })
 
     let res = await makeRequest()
@@ -67,15 +67,15 @@ export class ApiClient {
       }
 
       if (!res.ok) {
-      try {
-        const errJson = (await res.json()) as ApiResponse<T>
-        if (!('success' in errJson)) {
+        try {
+          const errJson = (await res.json()) as ApiResponse<T>
+          if (!('success' in errJson)) {
+            throw new ApiClientError(res.status, endpoint, res.statusText)
+          }
+          throw ApiClientError.fromApiError(errJson as unknown as ApiError)
+        } catch {
           throw new ApiClientError(res.status, endpoint, res.statusText)
         }
-        throw ApiClientError.fromApiError(errJson as unknown as ApiError)
-      } catch {
-        throw new ApiClientError(res.status, endpoint, res.statusText)
-      }
       }
     }
 
