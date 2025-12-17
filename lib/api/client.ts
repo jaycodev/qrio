@@ -34,6 +34,27 @@ export class ApiClient {
     }
   }
 
+  private async handleSessionExpired(): Promise<void> {
+    try {
+      await fetch(`${this.baseUrl}/auth/logout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      })
+    } catch {
+      // swallow errors on logout attempt
+    }
+    if (typeof window !== 'undefined') {
+      try {
+        const url = new URL('/', window.location.origin)
+        url.searchParams.set('session', 'expired')
+        window.location.href = url.toString()
+      } catch {
+        window.location.href = '/'
+      }
+    }
+  }
+
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`
     const devToken = process.env.NEXT_PUBLIC_DEV_ACCESS_TOKEN
@@ -64,6 +85,11 @@ export class ApiClient {
             // if still not ok, continue to error parsing below
           }
         }
+      }
+
+      // Global redirect on expired session after refresh still fails
+      if (!res.ok && (res.status === 401 || res.status === 403)) {
+        await this.handleSessionExpired()
       }
 
       if (!res.ok) {
