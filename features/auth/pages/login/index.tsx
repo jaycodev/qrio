@@ -1,4 +1,8 @@
+'use client'
+
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -11,13 +15,49 @@ import {
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
+import { authApi } from '@/lib/api/auth'
 
 export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) {
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setError(null)
+    const form = new FormData(e.currentTarget)
+    const email = String(form.get('email') ?? '')
+    const password = String(form.get('password') ?? '')
+    if (!email || !password) {
+      setError('Ingresa tu email y contraseña')
+      return
+    }
+    setLoading(true)
+    try {
+      console.log('Starting login request')
+      await authApi.login({ email, password })
+      console.log('Login success, forcing navigation to /admin')
+      // Navegación directa: evita depender de lectura de cookies en cliente
+      if (typeof window !== 'undefined') {
+        window.location.href = '/admin'
+        return
+      }
+      router.replace('/admin')
+      return
+    } catch (err) {
+      console.error('Login failed:', err)
+      setError('Credenciales inválidas o servicio no disponible')
+    } finally {
+      console.log('Finished login attempt')
+      setLoading(false)
+    }
+  }
+
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form className="p-6 md:p-8" onSubmit={handleSubmit}>
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -25,7 +65,14 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
               </div>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input id="email" type="email" placeholder="m@example.com" required />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  autoComplete="username"
+                  required
+                />
               </Field>
               <Field>
                 <div className="flex items-center">
@@ -34,10 +81,19 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
                     Forgot your password?
                   </Link>
                 </div>
-                <Input id="password" type="password" required />
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit" disabled={loading}>
+                  {loading ? 'Ingresando...' : 'Login'}
+                </Button>
+                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or continue with
