@@ -1,3 +1,4 @@
+import type { Row } from '@tanstack/react-table'
 import { Ellipsis, Info, Pencil } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -7,7 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { Row } from '@tanstack/react-table'
 
 interface Props<TData> {
   row: Row<TData>

@@ -2,13 +2,21 @@
 
 import { useMemo, useState } from 'react'
 
-import { TableListLayout } from '@admin/components/shared/table-list-layout'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { useForm } from 'react-hook-form'
 
+import { TableListLayout } from '@admin/components/shared/table-list-layout'
+
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { useListQuery } from '@/hooks/use-list-query'
 import { categoriesApi } from '@/lib/api/categories'
 import type { CategoryList } from '@/lib/schemas/categories/category.list.schema'
@@ -83,7 +91,9 @@ export function CategoryPage({ title, pathname, resource }: Props) {
                 )}
               />
               <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+                <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                  Cancelar
+                </Button>
                 <Button type="submit">Agregar</Button>
               </div>
             </form>

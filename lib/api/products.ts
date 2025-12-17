@@ -1,11 +1,4 @@
-import {
-  type ProductCreate,
-  productCreateSchema,
-} from '@/lib/schemas/products/product.create.schema'
-import {
-  type ProductDetail,
-  productDetailSchema,
-} from '@/lib/schemas/products/product.detail.schema'
+import { type ProductCreate } from '@/lib/schemas/products/product.create.schema'
 import { type ProductList, productListSchema } from '@/lib/schemas/products/product.list.schema'
 
 import { apiClient } from './client'

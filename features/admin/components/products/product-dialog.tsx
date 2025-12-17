@@ -1,18 +1,33 @@
 'use client'
 
 import * as React from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 
+<<<<<<< HEAD
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
+=======
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+
+import { Button } from '@/components/ui/button'
+import { ComboBox } from '@/components/ui/combobox'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+>>>>>>> 17c98e5c335f8369eda719d60fdc44c7a62d456c
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { ComboBox } from '@/components/ui/combobox'
-import { Button } from '@/components/ui/button'
-
 import { categoriesApi } from '@/lib/api/categories'
-import { productCreateSchema, type ProductCreate } from '@/lib/schemas/products/product.create.schema'
+import {
+  type ProductCreate,
+  productCreateSchema,
+} from '@/lib/schemas/products/product.create.schema'
 
 interface CategoryOption {
   id: number
@@ -27,7 +42,13 @@ interface ProductDialogProps {
   onSubmit: (values: ProductCreate, id?: number) => Promise<void>
 }
 
-export function ProductDialog({ open, mode, initialValues, onClose, onSubmit }: ProductDialogProps) {
+export function ProductDialog({
+  open,
+  mode,
+  initialValues,
+  onClose,
+  onSubmit,
+}: ProductDialogProps) {
   const form = useForm<ProductCreate>({
     resolver: zodResolver(productCreateSchema),
     defaultValues: {
@@ -74,7 +95,11 @@ export function ProductDialog({ open, mode, initialValues, onClose, onSubmit }: 
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {mode === 'create' ? 'Agregar Producto' : mode === 'edit' ? 'Editar Producto' : 'Detalle de Producto'}
+            {mode === 'create'
+              ? 'Agregar Producto'
+              : mode === 'edit'
+                ? 'Editar Producto'
+                : 'Detalle de Producto'}
           </DialogTitle>
           <DialogDescription>
             {mode === 'create'
@@ -127,7 +152,12 @@ export function ProductDialog({ open, mode, initialValues, onClose, onSubmit }: 
                 <FormItem>
                   <FormLabel>Descripción</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Descripción" {...field} disabled={readOnly} />
+                    <Textarea
+                      placeholder="Descripción"
+                      {...field}
+                      value={field.value ?? ''}
+                      disabled={readOnly}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -162,7 +192,12 @@ export function ProductDialog({ open, mode, initialValues, onClose, onSubmit }: 
                 <FormItem>
                   <FormLabel>Imagen (URL)</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://..." {...field} disabled={readOnly} />
+                    <Input
+                      placeholder="https://..."
+                      {...field}
+                      value={field.value ?? ''}
+                      disabled={readOnly}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

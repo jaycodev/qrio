@@ -1,17 +1,18 @@
 'use client'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { DollarSign, Package, PoundSterling, Tag, TagIcon } from 'lucide-react'
+import { Package } from 'lucide-react'
 
 import { DataTableRowActions } from '@admin/components/data-table/data-table-row-actions'
 
-import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { CategoryList, categorySchema } from '@/lib/schemas/categories/category.list.schema'
-import { Category } from '@/lib/types/categorie'
+import { CategoryList } from '@/lib/schemas/categories/category.list.schema'
 import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-header'
 
-export const getColumns = (): ColumnDef<CategoryList>[] => {
+export const getColumns = (
+  onEdit?: (category: CategoryList) => void,
+  onDetails?: (category: CategoryList) => void
+): ColumnDef<CategoryList>[] => {
   return [
     {
       id: 'select',
@@ -58,7 +59,7 @@ export const getColumns = (): ColumnDef<CategoryList>[] => {
     },
     {
       id: 'actions',
-      cell: () => <DataTableRowActions />,
+      cell: ({ row }) => <DataTableRowActions row={row} onEdit={onEdit} onDetails={onDetails} />,
     },
   ]
 }

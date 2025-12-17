@@ -12,7 +12,7 @@ import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-head
 
 export const getColumns = (
   onEdit?: (row: DiningTableList) => void,
-  onDetails?: (row: DiningTableList) => void,
+  onDetails?: (row: DiningTableList) => void
 ): ColumnDef<DiningTableList>[] => {
   return [
     {
@@ -90,13 +90,7 @@ export const getColumns = (
     },
     {
       id: 'actions',
-      cell: ({ row }) => (
-        <DataTableRowActions
-          row={row.original}
-          onEdit={onEdit}
-          onDetails={onDetails}
-        />
-      ),
+      cell: ({ row }) => <DataTableRowActions row={row} onEdit={onEdit} onDetails={onDetails} />,
     },
   ]
 }

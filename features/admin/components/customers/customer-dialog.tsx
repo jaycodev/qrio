@@ -1,10 +1,18 @@
 'use client'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { useForm } from 'react-hook-form'
+
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import type { CustomerList } from '@/lib/schemas/customers/customers.list.schema'
 
 type Mode = 'create' | 'edit' | 'details'
@@ -18,9 +26,21 @@ interface Props {
   onSubmitEdit?: (id: number, payload: { name: string; email: string }) => Promise<void>
 }
 
-export function CustomerDialog({ open, mode, initial, onClose, onSubmitCreate, onSubmitEdit }: Props) {
+export function CustomerDialog({
+  open,
+  mode,
+  initial,
+  onClose,
+  onSubmitCreate,
+  onSubmitEdit,
+}: Props) {
   const readOnly = mode === 'details'
-  const title = mode === 'create' ? 'Agregar Cliente' : mode === 'edit' ? 'Editar Cliente' : 'Detalle de Cliente'
+  const title =
+    mode === 'create'
+      ? 'Agregar Cliente'
+      : mode === 'edit'
+        ? 'Editar Cliente'
+        : 'Detalle de Cliente'
 
   const form = useForm<{ name: string; email: string }>({
     defaultValues: {
@@ -72,14 +92,21 @@ export function CustomerDialog({ open, mode, initial, onClose, onSubmitCreate, o
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="correo@dominio.com" {...field} readOnly={readOnly} />
+                    <Input
+                      type="email"
+                      placeholder="correo@dominio.com"
+                      {...field}
+                      readOnly={readOnly}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={onClose}>Cerrar</Button>
+              <Button type="button" variant="outline" onClick={onClose}>
+                Cerrar
+              </Button>
               {mode !== 'details' && <Button type="submit">Guardar</Button>}
             </div>
           </form>

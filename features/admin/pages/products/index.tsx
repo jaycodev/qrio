@@ -2,14 +2,15 @@
 
 import { useMemo, useState } from 'react'
 
-import { TableListLayout } from '@admin/components/shared/table-list-layout'
+import { useQueryClient } from '@tanstack/react-query'
+
 import { ProductDialog } from '@admin/components/products/product-dialog'
+import { TableListLayout } from '@admin/components/shared/table-list-layout'
 
 import { useListQuery } from '@/hooks/use-list-query'
 import { productsApi } from '@/lib/api/products'
-import type { ProductList } from '@/lib/schemas/products/product.list.schema'
 import type { ProductCreate } from '@/lib/schemas/products/product.create.schema'
-import { useQueryClient } from '@tanstack/react-query'
+import type { ProductList } from '@/lib/schemas/products/product.list.schema'
 
 import { getColumns } from './columns'
 
@@ -68,14 +69,18 @@ export function ProductsPage({ title, pathname, resource }: Props) {
       <ProductDialog
         open={showDialog}
         mode={dialogMode}
-        initialValues={selected ? {
-          id: selected.id,
-          name: selected.name,
-          description: selected.description,
-          price: selected.price,
-          categoryId: selected.category.id,
-          imageUrl: undefined,
-        } : undefined}
+        initialValues={
+          selected
+            ? {
+                id: selected.id,
+                name: selected.name,
+                description: selected.description,
+                price: selected.price,
+                categoryId: selected.category.id,
+                imageUrl: undefined,
+              }
+            : undefined
+        }
         onClose={() => setShowDialog(false)}
         onSubmit={async (values: ProductCreate, id?: number) => {
           if (dialogMode === 'create') {
