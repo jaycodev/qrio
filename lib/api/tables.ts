@@ -9,7 +9,12 @@ export const tablesApi = {
     const data = await apiClient.get(`${resource}?branchId=${branchId}`)
     return diningTableListSchema.array().parse(data)
   },
-  async create(payload: { branchId: number; floor: number; tableNumber?: number; qrCode?: string }): Promise<DiningTableList> {
+  async create(payload: {
+    branchId: number
+    floor: number
+    tableNumber?: number
+    qrCode?: string
+  }): Promise<DiningTableList> {
     const data = await apiClient.post(resource, payload)
     return diningTableListSchema.parse(data)
   },

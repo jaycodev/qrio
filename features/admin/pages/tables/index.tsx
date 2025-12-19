@@ -31,14 +31,11 @@ export function TablesPage({ title, pathname, resource }: Props) {
 
   const columns = useMemo(
     () =>
-      getColumns(
-        (row) => {
-          setSelected(row)
-          setDialogMode('edit')
-          setDialogOpen(true)
-        },
-        undefined
-      ),
+      getColumns((row) => {
+        setSelected(row)
+        setDialogMode('edit')
+        setDialogOpen(true)
+      }, undefined),
     []
   )
 

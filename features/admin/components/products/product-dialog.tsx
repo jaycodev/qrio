@@ -7,7 +7,13 @@ import { useForm } from 'react-hook-form'
 
 import { Button } from '@/components/ui/button'
 import { ComboBox } from '@/components/ui/combobox'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -111,15 +117,16 @@ export function ProductDialog({
             {mode === 'create'
               ? 'Completa los campos para registrar un nuevo producto.'
               : mode === 'edit'
-              ? 'Actualiza la información del producto seleccionado.'
-              : 'Visualiza la información del producto.'}
+                ? 'Actualiza la información del producto seleccionado.'
+                : 'Visualiza la información del producto.'}
           </DialogDescription>
         </DialogHeader>
         {(() => {
           const currentUrl = form.watch('imageUrl') ?? ''
-          const previewSrc = currentUrl && currentUrl.trim().length > 0
-            ? currentUrl.trim()
-            : '/images/placeholders/product.svg'
+          const previewSrc =
+            currentUrl && currentUrl.trim().length > 0
+              ? currentUrl.trim()
+              : '/images/placeholders/product.svg'
           return (
             <div className="flex items-center justify-center">
               <img

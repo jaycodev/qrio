@@ -55,12 +55,7 @@ export const getColumns = (
         return (
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 overflow-hidden rounded-md bg-muted">
-              <img
-                src={src}
-                alt={name}
-                className="h-9 w-9 object-cover"
-                loading="lazy"
-              />
+              <img src={src} alt={name} className="h-9 w-9 object-cover" loading="lazy" />
             </div>
             <span className="font-medium">{name}</span>
           </div>

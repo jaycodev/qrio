@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -62,20 +62,38 @@ export function AdminLoginPage({ className, ...props }: React.ComponentProps<'di
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Acceso App Admin</h1>
-                <p className="text-muted-foreground text-balance">Ingresa con credenciales de administrador de plataforma</p>
+                <p className="text-muted-foreground text-balance">
+                  Ingresa con credenciales de administrador de plataforma
+                </p>
               </div>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input id="email" name="email" type="email" placeholder="admin@qrio.com" autoComplete="username" required />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="admin@qrio.com"
+                  autoComplete="username"
+                  required
+                />
               </Field>
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <Link href="/iniciar-sesion" className="ml-auto text-sm underline-offset-2 hover:underline">
+                  <Link
+                    href="/iniciar-sesion"
+                    className="ml-auto text-sm underline-offset-2 hover:underline"
+                  >
                     Ir al login normal
                   </Link>
                 </div>
-                <Input id="password" name="password" type="password" autoComplete="current-password" required />
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                />
               </Field>
               <Field>
                 <Button type="submit" disabled={loading}>
@@ -86,7 +104,11 @@ export function AdminLoginPage({ className, ...props }: React.ComponentProps<'di
             </FieldGroup>
           </form>
           <div className="bg-muted relative hidden md:block">
-            <img src="/placeholder.svg" alt="Image" className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale" />
+            <img
+              src="/placeholder.svg"
+              alt="Image"
+              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+            />
           </div>
         </CardContent>
       </Card>

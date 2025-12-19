@@ -38,15 +38,12 @@ export function CategoryPage({ title, pathname, resource }: Props) {
   const [mode, setMode] = useState<'create' | 'edit'>('create')
   const columns = useMemo(
     () =>
-      getColumns(
-        (category) => {
-          setSelected(category)
-          setMode('edit')
-          setOpen(true)
-          form.reset({ name: category.name })
-        },
-        undefined
-      ),
+      getColumns((category) => {
+        setSelected(category)
+        setMode('edit')
+        setOpen(true)
+        form.reset({ name: category.name })
+      }, undefined),
     []
   )
 

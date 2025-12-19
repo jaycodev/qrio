@@ -152,7 +152,8 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
     const term = search.trim().toLowerCase()
     return catalog.filter((p) => {
       const byTerm = !term || p.name.toLowerCase().includes(term)
-      const byCat = categoryFilter === 'all' || (p.category && String(p.category.id) === categoryFilter)
+      const byCat =
+        categoryFilter === 'all' || (p.category && String(p.category.id) === categoryFilter)
       return byTerm && byCat
     })
   }, [catalog, search, categoryFilter])
@@ -219,7 +220,9 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
 
                 {/* Paginación */}
                 <div className="flex items-center justify-between gap-2">
-                  <div className="text-sm text-muted-foreground">Página {page} de {pageCount}</div>
+                  <div className="text-sm text-muted-foreground">
+                    Página {page} de {pageCount}
+                  </div>
                   <div className="flex items-center gap-1">
                     <Button
                       type="button"
@@ -294,7 +297,10 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
                             min={1}
                             value={qtyByProduct[p.id] ?? 1}
                             onChange={(e) =>
-                              setQtyByProduct((prev) => ({ ...prev, [p.id]: Number(e.target.value) }))
+                              setQtyByProduct((prev) => ({
+                                ...prev,
+                                [p.id]: Number(e.target.value),
+                              }))
                             }
                             className="w-20"
                             disabled={readOnly}
@@ -303,7 +309,9 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
                             type="button"
                             variant="outline"
                             onClick={() => addProduct(p.id, qtyByProduct[p.id])}
-                            disabled={readOnly || !!productsSelected.find((pi) => pi.productId === p.id)}
+                            disabled={
+                              readOnly || !!productsSelected.find((pi) => pi.productId === p.id)
+                            }
                           >
                             Agregar
                           </Button>
@@ -388,7 +396,9 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
                 <div className="space-y-2 rounded-md border p-3">
                   <div className="font-medium">Cesto ({productsSelected.length})</div>
                   {productsSelected.length === 0 ? (
-                    <div className="text-sm text-muted-foreground">No hay productos en el cesto</div>
+                    <div className="text-sm text-muted-foreground">
+                      No hay productos en el cesto
+                    </div>
                   ) : (
                     <div className="rounded-md border divide-y max-h-64 overflow-y-auto">
                       {productsSelected.map((item) => {
@@ -403,14 +413,18 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
                             <div className="flex-1 min-w-0">
                               <div className="font-medium truncate">{p?.name ?? 'Producto'}</div>
                               {p?.category && (
-                                <div className="text-xs text-muted-foreground">{p.category.name}</div>
+                                <div className="text-xs text-muted-foreground">
+                                  {p.category.name}
+                                </div>
                               )}
                             </div>
                             <Input
                               type="number"
                               min={1}
                               value={item.quantity}
-                              onChange={(e) => updateQuantity(item.productId, Number(e.target.value))}
+                              onChange={(e) =>
+                                updateQuantity(item.productId, Number(e.target.value))
+                              }
                               className="w-20"
                               disabled={readOnly}
                             />

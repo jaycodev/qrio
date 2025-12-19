@@ -193,9 +193,7 @@ export function OrderDialog({
                       className="h-12 w-12 rounded-md object-cover ring-1 ring-border"
                     />
                     <div className="flex-1">
-                      <div className="font-medium">
-                        {(item as any).productName ?? 'Producto'}
-                      </div>
+                      <div className="font-medium">{(item as any).productName ?? 'Producto'}</div>
                       <div className="text-sm text-muted-foreground">
                         Cantidad: {item.quantity} · Unit: S/. {item.unitPrice.toFixed(2)}
                       </div>
@@ -203,9 +201,8 @@ export function OrderDialog({
                     <div className="justify-self-end">
                       <Badge variant="outline" className="font-mono">
                         Subtotal: S/.{' '}
-                        {
-                          (item as any).subtotal?.toFixed?.(2) ?? (item.unitPrice * item.quantity).toFixed(2)
-                        }
+                        {(item as any).subtotal?.toFixed?.(2) ??
+                          (item.unitPrice * item.quantity).toFixed(2)}
                       </Badge>
                     </div>
                   </div>
@@ -214,12 +211,17 @@ export function OrderDialog({
             </div>
             <div className="flex justify-end pt-2">
               <div className="rounded-md bg-primary/10 px-3 py-2 text-sm font-semibold text-primary">
-                Total: S/. {(
+                Total: S/.{' '}
+                {(
                   detailTotal ??
                   form
                     .getValues('items')
                     .reduce(
-                      (acc, it: any) => acc + (typeof it.subtotal === 'number' ? it.subtotal : it.unitPrice * it.quantity),
+                      (acc, it: any) =>
+                        acc +
+                        (typeof it.subtotal === 'number'
+                          ? it.subtotal
+                          : it.unitPrice * it.quantity),
                       0
                     )
                 ).toFixed(2)}
