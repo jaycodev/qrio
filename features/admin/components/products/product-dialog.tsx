@@ -55,6 +55,17 @@ export function ProductDialog({
     },
   })
 
+  // Rehidratar el formulario cuando cambian los valores iniciales o el modo
+  React.useEffect(() => {
+    form.reset({
+      categoryId: initialValues?.categoryId ?? (undefined as unknown as number),
+      name: initialValues?.name ?? '',
+      description: (initialValues?.description as string) ?? '',
+      price: (initialValues?.price as number) ?? 0,
+      imageUrl: (initialValues?.imageUrl as string) ?? '',
+    })
+  }, [initialValues, mode, open])
+
   const [categories, setCategories] = React.useState<CategoryOption[]>([])
   const [loadingCategories, setLoadingCategories] = React.useState(false)
   const [submitting, setSubmitting] = React.useState(false)
@@ -104,6 +115,21 @@ export function ProductDialog({
               : 'Visualiza la información del producto.'}
           </DialogDescription>
         </DialogHeader>
+        {(() => {
+          const currentUrl = form.watch('imageUrl') ?? ''
+          const previewSrc = currentUrl && currentUrl.trim().length > 0
+            ? currentUrl.trim()
+            : '/images/placeholders/product.svg'
+          return (
+            <div className="flex items-center justify-center">
+              <img
+                src={previewSrc}
+                alt="Vista previa del producto"
+                className="h-32 w-32 rounded-md object-cover border"
+              />
+            </div>
+          )
+        })()}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField

@@ -42,9 +42,13 @@ export function ProductsPage({ title, pathname, resource }: Props) {
           setSelected(product)
           setDialogMode('details')
           setShowDialog(true)
+        },
+        async (product, next) => {
+          await productsApi.setAvailability(product.id, 1, next)
+          await queryClient.invalidateQueries({ queryKey: [resource] })
         }
       ),
-    []
+    [queryClient]
   )
 
   if (error) {
@@ -77,7 +81,7 @@ export function ProductsPage({ title, pathname, resource }: Props) {
                 description: selected.description,
                 price: selected.price,
                 categoryId: selected.category.id,
-                imageUrl: undefined,
+                imageUrl: selected.imageUrl ?? '',
               }
             : undefined
         }

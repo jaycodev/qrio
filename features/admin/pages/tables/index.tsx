@@ -21,7 +21,7 @@ interface Props {
 }
 
 export function TablesPage({ title, pathname, resource }: Props) {
-  const { data, error } = useListQuery<DiningTableList[]>(pathname, [resource], () =>
+  const { data, error, refetch } = useListQuery<DiningTableList[]>(pathname, [resource], () =>
     tablesApi.getAll(1)
   )
 
@@ -37,17 +37,13 @@ export function TablesPage({ title, pathname, resource }: Props) {
           setDialogMode('edit')
           setDialogOpen(true)
         },
-        (row) => {
-          setSelected(row)
-          setDialogMode('details')
-          setDialogOpen(true)
-        }
+        undefined
       ),
     []
   )
 
-  const form = useForm<{ tableNumber: number; floor: number }>({
-    defaultValues: { tableNumber: 0 as unknown as number, floor: 1 },
+  const form = useForm<{ floor: number }>({
+    defaultValues: { floor: 1 },
   })
 
   const handleAdd = () => {
@@ -56,10 +52,10 @@ export function TablesPage({ title, pathname, resource }: Props) {
     setDialogOpen(true)
   }
 
-  const onSubmit = async (values: { tableNumber: number; floor: number }) => {
-    await tablesApi.create({ tableNumber: Number(values.tableNumber), floor: Number(values.floor) })
+  const onSubmit = async (values: { floor: number }) => {
+    await tablesApi.create({ branchId: 1, floor: Number(values.floor) })
     setDialogOpen(false)
-    form.reset({ tableNumber: 0 as unknown as number, floor: 1 })
+    form.reset({ floor: 1 })
     // Optionally invalidate query via react-query if available in scope
   }
 
@@ -84,7 +80,12 @@ export function TablesPage({ title, pathname, resource }: Props) {
         initial={selected}
         onClose={() => setDialogOpen(false)}
         onSubmitCreate={async (payload) => {
-          await tablesApi.create(payload)
+          await tablesApi.create({ branchId: 1, floor: payload.floor })
+          await refetch()
+        }}
+        onSubmitEdit={async (id, payload) => {
+          await tablesApi.updateFloor(id, { floor: payload.floor })
+          await refetch()
         }}
       />
     </>

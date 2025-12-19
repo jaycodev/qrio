@@ -40,15 +40,30 @@ export function OrdersPage({ title, pathname, resource }: Props) {
           tables: filterOptions?.tables,
           customers: filterOptions?.customers,
         },
+        undefined,
         (order) => {
-          setSelected(order)
-          setDialogMode('edit')
-          setShowDialog(true)
-        },
-        (order) => {
-          setSelected(order)
-          setDialogMode('details')
-          setShowDialog(true)
+          // Cargar detalle antes de abrir el diálogo
+          ordersApi.getById(order.id).then((detail) => {
+            setSelected({
+              id: detail.id,
+              code: order.code,
+              table: { id: Number(detail.tableId), number: order.table.number },
+              customer: {
+                id: Number(detail.customerId),
+                code: order.customer.code,
+                name: order.customer.name,
+              },
+              status: order.status,
+              total: detail.total,
+              people: detail.people,
+              itemCount: detail.items.length,
+            })
+
+            setDialogMode('details')
+            setShowDialog(true)
+            // Rehidratar items enriquecidos en el diálogo mediante initialValues
+            // (se pasan como parte de initialValues abajo)
+          })
         }
       ),
     [filterOptions]
@@ -67,11 +82,6 @@ export function OrdersPage({ title, pathname, resource }: Props) {
         title={title}
         description="Rápidos, claros y ordenados."
         pathname={pathname}
-        onAdd={() => {
-          setSelected(undefined)
-          setDialogMode('create')
-          setShowDialog(true)
-        }}
       />
       <OrderDialog
         open={showDialog}
@@ -83,6 +93,7 @@ export function OrdersPage({ title, pathname, resource }: Props) {
                 customerId: selected.customer.id,
                 people: selected.people,
                 status: selected.status,
+                // Cuando se abre detalles, llenamos items via otro fetch y reseteamos desde el diálogo
                 items: [],
               }
             : undefined

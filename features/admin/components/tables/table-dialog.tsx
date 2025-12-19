@@ -22,8 +22,8 @@ interface Props {
   mode: Mode
   initial?: DiningTableList | null
   onClose: () => void
-  onSubmitCreate: (payload: { tableNumber: number; floor: number }) => Promise<void>
-  onSubmitEdit?: (id: number, payload: { tableNumber: number; floor: number }) => Promise<void>
+  onSubmitCreate: (payload: { floor: number }) => Promise<void>
+  onSubmitEdit?: (id: number, payload: { floor: number }) => Promise<void>
 }
 
 export function TableDialog({ open, mode, initial, onClose, onSubmitCreate, onSubmitEdit }: Props) {
@@ -31,23 +31,21 @@ export function TableDialog({ open, mode, initial, onClose, onSubmitCreate, onSu
   const title =
     mode === 'create' ? 'Agregar Mesa' : mode === 'edit' ? 'Editar Mesa' : 'Detalle de Mesa'
 
-  const form = useForm<{ tableNumber: number; floor: number }>({
+  const form = useForm<{ floor: number }>({
     defaultValues: {
-      tableNumber: initial?.tableNumber ?? (0 as unknown as number),
       floor: initial?.floor ?? 1,
     },
     values: {
-      tableNumber: initial?.tableNumber ?? (0 as unknown as number),
       floor: initial?.floor ?? 1,
     },
   })
 
-  const handleSubmit = async (values: { tableNumber: number; floor: number }) => {
-    const payload = { tableNumber: Number(values.tableNumber), floor: Number(values.floor) }
+  const handleSubmit = async (values: { floor: number }) => {
+    const payload = { floor: Number(values.floor) }
     if (mode === 'create') {
       await onSubmitCreate(payload)
     } else if (mode === 'edit' && initial && onSubmitEdit) {
-      await onSubmitEdit(Number(initial.id), payload)
+      await onSubmitEdit(Number(initial.id), { floor: payload.floor })
     }
     onClose()
   }
@@ -60,20 +58,12 @@ export function TableDialog({ open, mode, initial, onClose, onSubmitCreate, onSu
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="tableNumber"
-              rules={{ required: 'El número es requerido' }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Número</FormLabel>
-                  <FormControl>
-                    <Input type="number" min={1} {...field} readOnly={readOnly} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {mode === 'edit' && (
+              <div className="space-y-2">
+                <div className="text-sm text-muted-foreground">Mesa</div>
+                <div className="text-sm font-medium">Mesa {initial?.tableNumber}</div>
+              </div>
+            )}
             <FormField
               control={form.control}
               name="floor"

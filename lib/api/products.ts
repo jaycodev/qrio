@@ -18,4 +18,10 @@ export const productsApi = {
     const data = await apiClient.put(`${resource}/${id}?branchId=${branchId}`, payload)
     return productListSchema.parse(data)
   },
+  async setAvailability(id: number, branchId: number, available: boolean): Promise<boolean> {
+    const data = await apiClient.patch(`${resource}/${id}/availability?branchId=${branchId}`, {
+      available,
+    })
+    return Boolean(data)
+  },
 }

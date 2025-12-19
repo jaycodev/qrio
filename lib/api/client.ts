@@ -149,6 +149,14 @@ export class ApiClient {
   delete<T>(endpoint: string, options?: RequestInit) {
     return this.request<T>(endpoint, { method: 'DELETE', ...options })
   }
+
+  patch<T>(endpoint: string, body?: unknown, options?: RequestInit) {
+    return this.request<T>(endpoint, {
+      method: 'PATCH',
+      body: body ? JSON.stringify(body) : undefined,
+      ...options,
+    })
+  }
 }
 
 export const apiClient = new ApiClient()
