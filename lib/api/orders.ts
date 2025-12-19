@@ -3,6 +3,7 @@ import {
   orderFilterOptionsSchema,
 } from '@/lib/schemas/order/order.filter.options.schema'
 import { type OrderList, orderListSchema } from '@/lib/schemas/order/order.list.schema'
+import { type OrderDetail, orderDetailSchema } from '@/lib/schemas/order/order.detail.schema'
 
 import { apiClient } from './client'
 
@@ -17,6 +18,11 @@ export const ordersApi = {
   async getFilterOptions(branchId: number): Promise<OrderFilterOptions> {
     const data = await apiClient.get(`${resource}/filter-options?branchId=${branchId}`)
     return orderFilterOptionsSchema.parse(data)
+  },
+
+  async getById(id: number): Promise<OrderDetail> {
+    const data = await apiClient.get(`${resource}/${id}`)
+    return orderDetailSchema.parse(data)
   },
 
   async create(payload: {

@@ -6,6 +6,7 @@ import { DollarSign, Package, PoundSterling, Tag, TagIcon } from 'lucide-react'
 import { DataTableRowActions } from '@admin/components/data-table/data-table-row-actions'
 
 import { Badge } from '@/components/ui/badge'
+import { Switch } from '@/components/ui/switch'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { Category, ProductList } from '@/lib/schemas/products/product.list.schema'
 import { withMetaLabelFilter } from '@/lib/utils/components/with-meta-label-filter'
@@ -16,7 +17,8 @@ import { statusOptions } from '../products/filter-options'
 
 export const getColumns = (
   onEdit?: (product: ProductList) => void,
-  onDetails?: (product: ProductList) => void
+  onDetails?: (product: ProductList) => void,
+  onToggleAvailability?: (product: ProductList, next: boolean) => void
 ): ColumnDef<ProductList>[] => {
   return [
     {
@@ -49,9 +51,12 @@ export const getColumns = (
       header: withMetaLabelHeader<ProductList>(),
       cell: ({ row }) => {
         const name = row.original.name
+        const src = row.original.imageUrl || '/images/placeholders/product.png'
         return (
-          <div className="flex items-center space-x-2">
-            <Package className="h-4 w-4 text-muted-foreground" />
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 overflow-hidden rounded-md bg-muted">
+              <img src={src} alt={name} className="h-9 w-9 object-cover" loading="lazy" />
+            </div>
             <span className="font-medium">{name}</span>
           </div>
         )
@@ -104,17 +109,26 @@ export const getColumns = (
     },
     {
       id: 'Status',
-      accessorKey: 'active',
+      accessorKey: 'available',
       header: withMetaLabelHeader<ProductList>(),
       cell: ({ row }) => {
-        const meta = statusBadges[row.original.available.toString() as keyof typeof statusBadges]
-        if (!meta) return null
-        const Icon = meta.icon
+        const available = row.original.available ?? false
+        const meta = statusBadges[available.toString() as keyof typeof statusBadges]
+        const Icon = meta?.icon
         return (
-          <Badge variant={meta.variant}>
-            <Icon className="mr-1" />
-            {meta.label}{' '}
-          </Badge>
+          <div className="flex items-center justify-center gap-2">
+            {Icon ? (
+              <Badge variant={meta.variant}>
+                <Icon className="mr-1" />
+                {meta.label}
+              </Badge>
+            ) : null}
+            <Switch
+              checked={available}
+              onCheckedChange={(next) => onToggleAvailability?.(row.original, !!next)}
+              aria-label="Cambiar disponibilidad"
+            />
+          </div>
         )
       },
       enableSorting: false,
@@ -122,7 +136,7 @@ export const getColumns = (
         headerClass: 'text-center',
         cellClass: 'text-center',
         ...withMetaLabelFilter<ProductList>({
-          columnId: 'active',
+          columnId: 'available',
           options: statusOptions,
         }),
       },

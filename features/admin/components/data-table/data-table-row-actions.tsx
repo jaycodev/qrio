@@ -28,14 +28,18 @@ export function DataTableRowActions<TData>({ row, onEdit, onDetails }: Props<TDa
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => onDetails?.(row.original)}>
-          <Info />
-          Detalles
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onEdit?.(row.original)}>
-          <Pencil />
-          Editar
-        </DropdownMenuItem>
+        {onDetails && (
+          <DropdownMenuItem onClick={() => onDetails(row.original)}>
+            <Info />
+            Detalles
+          </DropdownMenuItem>
+        )}
+        {onEdit && (
+          <DropdownMenuItem onClick={() => onEdit(row.original)}>
+            <Pencil />
+            Editar
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

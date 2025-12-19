@@ -30,23 +30,44 @@ interface Props {
 }
 
 export function CategoryPage({ title, pathname, resource }: Props) {
-  const { data, error } = useListQuery<CategoryList[]>(pathname, [resource], () =>
+  const { data, error, refetch } = useListQuery<CategoryList[]>(pathname, [resource], () =>
     categoriesApi.getAll(1)
   )
 
-  const columns = useMemo(() => getColumns(), [])
+  const [selected, setSelected] = useState<CategoryList | null>(null)
+  const [mode, setMode] = useState<'create' | 'edit'>('create')
+  const columns = useMemo(
+    () =>
+      getColumns((category) => {
+        setSelected(category)
+        setMode('edit')
+        setOpen(true)
+        form.reset({ name: category.name })
+      }, undefined),
+    []
+  )
 
   const [open, setOpen] = useState(false)
   const form = useForm<{ name: string }>({ defaultValues: { name: '' } })
 
   const handleAdd = async () => {
+    setSelected(null)
+    setMode('create')
+    form.reset({ name: '' })
     setOpen(true)
   }
 
   const onSubmit = async (values: { name: string }) => {
-    await categoriesApi.create({ name: values.name })
+    if (mode === 'create') {
+      // TODO: Obtener restaurantId dinámico si existe contexto; por ahora 1
+      await categoriesApi.create({ restaurantId: 1, name: values.name })
+    } else if (mode === 'edit' && selected?.id) {
+      await categoriesApi.update(selected.id, { name: values.name })
+    }
     form.reset()
     setOpen(false)
+    // Refrescar datos inmediatamente tras crear
+    await refetch()
     // naive refetch: reload route query by window focus behavior; alternatively integrate react-query invalidate
     // For now, rely on refetchOnWindowFocus or add explicit reload:
     // location.reload()
@@ -72,7 +93,7 @@ export function CategoryPage({ title, pathname, resource }: Props) {
       <Dialog open={open} onOpenChange={(v) => !v && setOpen(false)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Agregar Categoría</DialogTitle>
+            <DialogTitle>{mode === 'edit' ? 'Editar Categoría' : 'Agregar Categoría'}</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -94,7 +115,7 @@ export function CategoryPage({ title, pathname, resource }: Props) {
                 <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                   Cancelar
                 </Button>
-                <Button type="submit">Agregar</Button>
+                <Button type="submit">{mode === 'edit' ? 'Guardar' : 'Agregar'}</Button>
               </div>
             </form>
           </Form>

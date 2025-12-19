@@ -9,7 +9,8 @@ export const productListSchema = z.object({
   id: z.number(),
   category: categorySchema,
   name: z.string().min(1, 'El nombre del producto no puede estar vacío'),
-  description: z.string().optional(),
+  description: z.string().optional().nullable(),
+  imageUrl: z.string().url().optional().nullable(),
   price: z.number().positive('El precio debe ser un número positivo'),
   available: z.boolean(),
 })
