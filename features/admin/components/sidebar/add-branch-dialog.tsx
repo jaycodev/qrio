@@ -5,7 +5,6 @@ import * as React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
 
 import { useTenant } from '@/app/providers/tenant-provider'
 import { Button } from '@/components/ui/button'
@@ -20,10 +19,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { branchesApi } from '@/lib/api/branches'
-import {
-  type CreateBranchRequest,
-  createBranchRequestSchema,
-} from '@/lib/schemas/branches/branch.create.request.schema'
+import { createBranchRequestSchema } from '@/lib/schemas/branches/branch.create.request.schema'
 import type { BranchList } from '@/lib/schemas/branches/branch.list.schema'
 
 type Props = {
@@ -31,8 +27,6 @@ type Props = {
   onOpenChange: (value: boolean) => void
   onCreated?: (branch: BranchList) => void
 }
-
-// Usamos tipos implícitos de React Hook Form para evitar conflictos con el resolver
 
 export function AddBranchDialog({ open, onOpenChange, onCreated }: Props) {
   const tenant = useTenant()

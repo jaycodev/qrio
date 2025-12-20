@@ -35,9 +35,7 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
     }
     setLoading(true)
     try {
-      console.log('Starting login request')
       await authApi.login({ email, password })
-      // Obtener el perfil del usuario para validar sesión y precargar contexto
       try {
         const me = await authApi.me()
 
@@ -53,18 +51,14 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
           router.replace('/empleado')
           return
         }
-        //console.log('User profile loaded from /auth/me:', me)
       } catch (meErr) {
         console.warn('Could not fetch /auth/me after login, proceeding anyway:', meErr)
       }
-      //console.log('Login success, forcing navigation to /admin')
-      // Navegación directa: evita depender de lectura de cookies en cliente
       return
     } catch (err) {
       console.error('Login failed:', err)
       setError('Credenciales inválidas o servicio no disponible')
     } finally {
-      console.log('Finished login attempt')
       setLoading(false)
     }
   }

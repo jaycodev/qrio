@@ -8,7 +8,6 @@ import { TableListLayout } from '@admin/components/shared/table-list-layout'
 import { TableDialog } from '@admin/components/tables/table-dialog'
 
 import { useTenant } from '@/app/providers/tenant-provider'
-import { Button } from '@/components/ui/button'
 import { useListQuery } from '@/hooks/use-list-query'
 import { tablesApi } from '@/lib/api/tables'
 import type { DiningTableList } from '@/lib/schemas/table/table.list.schema'
@@ -57,7 +56,6 @@ export function TablesPage({ title, pathname, resource }: Props) {
     await tablesApi.create({ branchId: tenant.branchId ?? 0, floor: Number(values.floor) })
     setDialogOpen(false)
     form.reset({ floor: 1 })
-    // Optionally invalidate query via react-query if available in scope
   }
 
   if (error) {

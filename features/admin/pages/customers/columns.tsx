@@ -1,7 +1,7 @@
 'use client'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { Calendar, DollarSign, Mail, Package, PoundSterling, Tag, TagIcon } from 'lucide-react'
+import { Calendar, Mail, Package } from 'lucide-react'
 
 import { DataTableRowActions } from '@admin/components/data-table/data-table-row-actions'
 

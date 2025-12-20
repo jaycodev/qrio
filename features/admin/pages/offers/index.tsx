@@ -3,7 +3,6 @@
 import { useMemo, useState } from 'react'
 
 import { useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
 
 import { OfferDialog } from '@admin/components/offers/offer-dialog'
 import { TableListLayout } from '@admin/components/shared/table-list-layout'
@@ -30,7 +29,6 @@ export function OffersPage({ title, pathname, resource }: Props) {
     () => offersApi.getAll(tenant.branchId ?? 0)
   )
   const queryClient = useQueryClient()
-  const router = useRouter()
 
   const [showDialog, setShowDialog] = useState(false)
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'details'>('create')
@@ -59,7 +57,6 @@ export function OffersPage({ title, pathname, resource }: Props) {
     () =>
       getColumns(
         async (offer) => {
-          // Abrir el mismo modal en modo edición, precargando detalle y productos
           const detail = await offersApi.getById(offer.id)
           setInitialValues({
             id: detail.id,
@@ -76,7 +73,6 @@ export function OffersPage({ title, pathname, resource }: Props) {
           setShowDialog(true)
         },
         (offer) => {
-          // Alternar despliegue de productos en la fila
           toggleExpand(offer.id)
         },
         async (offer) => {
