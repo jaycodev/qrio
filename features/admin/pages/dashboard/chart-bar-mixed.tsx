@@ -1,90 +1,55 @@
 'use client'
 
-import { TrendingUp } from 'lucide-react'
 import { Bar, BarChart, XAxis, YAxis } from 'recharts'
+import { useQuery } from '@tanstack/react-query'
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from '@/components/ui/chart'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import { useTenant } from '@/app/providers/tenant-provider'
+import { productsApi } from '@/lib/api/products'
 
-const chartData = [
-  { level: 'primary', books: 320, fill: 'var(--color-primary)' },
-  { level: 'secondary', books: 450, fill: 'var(--color-secondary)' },
-  { level: 'superior', books: 610, fill: 'var(--color-superior)' },
-  { level: 'general', books: 180, fill: 'var(--color-general)' },
-]
-
-const chartConfig = {
-  books: {
-    label: 'Libros',
-  },
-  primary: {
-    label: 'Primaria',
-    color: 'var(--chart-1)',
-  },
-  secondary: {
-    label: 'Secundaria',
-    color: 'var(--chart-2)',
-  },
-  superior: {
-    label: 'Superior',
-    color: 'var(--chart-3)',
-  },
-  general: {
-    label: 'General',
-    color: 'var(--chart-5)',
-  },
-} satisfies ChartConfig
+type Datum = { category: string; count: number }
 
 export function ChartBarMixed() {
+  const tenant = useTenant()
+  const { data: items } = useQuery({
+    queryKey: ['dashboard', 'products', tenant.branchId],
+    enabled: !!tenant.branchId && tenant.loading === false,
+    queryFn: async () => productsApi.getAll(tenant.branchId as number),
+  })
+
+  const grouped: Datum[] = Object.values(
+    (items ?? []).reduce<Record<string, Datum>>((acc, p) => {
+      const key = p.category.name
+      acc[key] = acc[key] ?? { category: key, count: 0 }
+      acc[key].count += 1
+      return acc
+    }, {})
+  )
+
+  const chartConfig: ChartConfig = {
+    count: {
+      label: 'Productos',
+      theme: { light: '#6366f1', dark: '#818cf8' },
+    },
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Libros por Nivel de Categoría</CardTitle>
-        <CardDescription>Distribución del inventario por nivel educativo.</CardDescription>
+        <CardTitle>Productos por Categoría</CardTitle>
+        <CardDescription>Distribución del catálogo por categoría.</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <BarChart
-            accessibilityLayer
-            data={chartData}
-            layout="vertical"
-            margin={{
-              left: 20,
-            }}
-          >
-            <YAxis
-              dataKey="level"
-              type="category"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              tickFormatter={(value) => chartConfig[value as keyof typeof chartConfig]?.label}
-            />
-            <XAxis dataKey="books" type="number" hide />
+          <BarChart accessibilityLayer data={grouped} layout="vertical" margin={{ left: 20 }}>
+            <YAxis dataKey="category" type="category" tickLine={false} tickMargin={10} axisLine={false} />
+            <XAxis dataKey="count" type="number" hide />
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-            <Bar dataKey="books" layout="vertical" radius={5} />
+            <Bar dataKey="count" layout="vertical" radius={6} fill="var(--color-count)" />
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 leading-none font-medium">
-          La categoría Superior tiene el mayor número de títulos.
-          <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="text-muted-foreground leading-none">Total de categorías analizadas.</div>
-      </CardFooter>
     </Card>
   )
 }
