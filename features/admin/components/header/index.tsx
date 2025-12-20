@@ -25,7 +25,7 @@ export function Header() {
           document.cookie = `${name}=; Max-Age=0; Path=/;`
         }
       } catch {}
-      router.push('/')
+      router.push('/iniciar-sesion')
     }
   }
 
