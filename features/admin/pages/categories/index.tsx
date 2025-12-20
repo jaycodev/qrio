@@ -19,6 +19,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { useListQuery } from '@/hooks/use-list-query'
 import { categoriesApi } from '@/lib/api/categories'
+import { useTenant } from '@/app/providers/tenant-provider'
 import type { CategoryList } from '@/lib/schemas/categories/category.list.schema'
 
 import { getColumns } from './columns'
@@ -30,8 +31,11 @@ interface Props {
 }
 
 export function CategoryPage({ title, pathname, resource }: Props) {
-  const { data, error, refetch } = useListQuery<CategoryList[]>(pathname, [resource], () =>
-    categoriesApi.getAll(1)
+  const tenant = useTenant()
+  const { data, error, refetch } = useListQuery<CategoryList[]>(
+    pathname,
+    [resource, String(tenant.restaurantId ?? '')],
+    () => (tenant.restaurantId ? categoriesApi.getAll(tenant.restaurantId) : Promise.resolve([]))
   )
 
   const [selected, setSelected] = useState<CategoryList | null>(null)
@@ -59,8 +63,7 @@ export function CategoryPage({ title, pathname, resource }: Props) {
 
   const onSubmit = async (values: { name: string }) => {
     if (mode === 'create') {
-      // TODO: Obtener restaurantId dinámico si existe contexto; por ahora 1
-      await categoriesApi.create({ restaurantId: 1, name: values.name })
+      await categoriesApi.create({ restaurantId: tenant.restaurantId ?? 0, name: values.name })
     } else if (mode === 'edit' && selected?.id) {
       await categoriesApi.update(selected.id, { name: values.name })
     }

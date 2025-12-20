@@ -8,7 +8,14 @@ import { toast } from 'sonner'
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useTenant } from '@/app/providers/tenant-provider'
 import { branchesApi } from '@/lib/api/branches'
@@ -27,9 +34,7 @@ type Props = {
 export function AddBranchDialog({ open, onOpenChange, onCreated }: Props) {
   const tenant = useTenant()
   const form = useForm<Pick<CreateBranchRequest, 'name' | 'address' | 'phone' | 'schedule'>>({
-    resolver: zodResolver(
-      createBranchRequestSchema.omit({ restaurantId: true })
-    ),
+    resolver: zodResolver(createBranchRequestSchema.omit({ restaurantId: true })),
     defaultValues: {
       name: '',
       address: '',
@@ -127,7 +132,12 @@ export function AddBranchDialog({ open, onOpenChange, onCreated }: Props) {
               )}
             />
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="secondary" onClick={() => onOpenChange(false)} disabled={submitting}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => onOpenChange(false)}
+                disabled={submitting}
+              >
                 Cancelar
               </Button>
               <Button type="submit" disabled={submitting}>

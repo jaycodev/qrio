@@ -130,7 +130,7 @@ export function ProfileForm() {
       const [firstName, ...rest] = name.split(' ').filter(Boolean)
       const lastName = rest.join(' ')
       const email = tenant.user.email || ''
-      const username = email.includes('@') ? email.split('@')[0] : (name || 'user')
+      const username = email.includes('@') ? email.split('@')[0] : name || 'user'
       personalForm.reset({
         username,
         email,

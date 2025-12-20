@@ -4,7 +4,12 @@ import { Bar, BarChart, XAxis, YAxis } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart'
 import { useTenant } from '@/app/providers/tenant-provider'
 import { productsApi } from '@/lib/api/products'
 
@@ -43,7 +48,13 @@ export function ChartBarMixed() {
       <CardContent>
         <ChartContainer config={chartConfig}>
           <BarChart accessibilityLayer data={grouped} layout="vertical" margin={{ left: 20 }}>
-            <YAxis dataKey="category" type="category" tickLine={false} tickMargin={10} axisLine={false} />
+            <YAxis
+              dataKey="category"
+              type="category"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+            />
             <XAxis dataKey="count" type="number" hide />
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
             <Bar dataKey="count" layout="vertical" radius={6} fill="var(--color-count)" />

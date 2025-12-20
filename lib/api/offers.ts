@@ -1,4 +1,5 @@
 import { OfferList, offerListSchema } from '@/lib/schemas/offers/offers.list.schema'
+import { OfferDetail, offerDetailSchema } from '@/lib/schemas/offers/offers.detail.schema'
 
 import { apiClient } from './client'
 
@@ -8,6 +9,10 @@ export const offersApi = {
   async getAll(branchId: number): Promise<OfferList[]> {
     const data = await apiClient.get(`${resource}?branchId=${branchId}`)
     return offerListSchema.array().parse(data)
+  },
+  async getById(id: number): Promise<OfferDetail> {
+    const data = await apiClient.get(`${resource}/${id}`)
+    return offerDetailSchema.parse(data)
   },
   async create(payload: {
     restaurantId: number
@@ -31,6 +36,10 @@ export const offersApi = {
     }
   ): Promise<OfferList> {
     const data = await apiClient.put(`${resource}/${id}`, payload)
+    return offerListSchema.parse(data)
+  },
+  async updateActive(id: number, active: boolean): Promise<OfferList> {
+    const data = await apiClient.patch(`${resource}/${id}/active`, { active })
     return offerListSchema.parse(data)
   },
 }

@@ -30,7 +30,12 @@ export function TeamSwitcher() {
   const activeBranch = branches.find((b) => b.id === tenant.branchId) ?? branches[0]
 
   React.useEffect(() => {
-    console.log('[TeamSwitcher] tenant state -> restaurantId:', tenant.restaurantId, 'branchId:', tenant.branchId)
+    console.log(
+      '[TeamSwitcher] tenant state -> restaurantId:',
+      tenant.restaurantId,
+      'branchId:',
+      tenant.branchId
+    )
   }, [tenant.restaurantId, tenant.branchId])
 
   React.useEffect(() => {
@@ -64,7 +69,9 @@ export function TeamSwitcher() {
             side={isMobile ? 'bottom' : 'right'}
             sideOffset={4}
           >
-            <DropdownMenuLabel className="text-muted-foreground text-xs">Sucursal</DropdownMenuLabel>
+            <DropdownMenuLabel className="text-muted-foreground text-xs">
+              Sucursal
+            </DropdownMenuLabel>
             {branches.map((b) => (
               <DropdownMenuItem
                 key={b.id}

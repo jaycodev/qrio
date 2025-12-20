@@ -10,6 +10,7 @@ import { TableDialog } from '@admin/components/tables/table-dialog'
 import { Button } from '@/components/ui/button'
 import { useListQuery } from '@/hooks/use-list-query'
 import { tablesApi } from '@/lib/api/tables'
+import { useTenant } from '@/app/providers/tenant-provider'
 import type { DiningTableList } from '@/lib/schemas/table/table.list.schema'
 
 import { getColumns } from './columns'
@@ -21,8 +22,11 @@ interface Props {
 }
 
 export function TablesPage({ title, pathname, resource }: Props) {
-  const { data, error, refetch } = useListQuery<DiningTableList[]>(pathname, [resource], () =>
-    tablesApi.getAll(1)
+  const tenant = useTenant()
+  const { data, error, refetch } = useListQuery<DiningTableList[]>(
+    pathname,
+    [resource, String(tenant.branchId ?? '')],
+    () => tablesApi.getAll(tenant.branchId ?? 0)
   )
 
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -50,7 +54,7 @@ export function TablesPage({ title, pathname, resource }: Props) {
   }
 
   const onSubmit = async (values: { floor: number }) => {
-    await tablesApi.create({ branchId: 1, floor: Number(values.floor) })
+    await tablesApi.create({ branchId: tenant.branchId ?? 0, floor: Number(values.floor) })
     setDialogOpen(false)
     form.reset({ floor: 1 })
     // Optionally invalidate query via react-query if available in scope
@@ -77,7 +81,7 @@ export function TablesPage({ title, pathname, resource }: Props) {
         initial={selected}
         onClose={() => setDialogOpen(false)}
         onSubmitCreate={async (payload) => {
-          await tablesApi.create({ branchId: 1, floor: payload.floor })
+          await tablesApi.create({ branchId: tenant.branchId ?? 0, floor: payload.floor })
           await refetch()
         }}
         onSubmitEdit={async (id, payload) => {

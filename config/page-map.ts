@@ -38,11 +38,11 @@ export const pageMap: Record<string, PageMeta> = {
     showInSidebar: true,
     resource: 'offers',
   },
-  '/admin/clientes': {
-    title: 'Clientes',
+  '/admin/empleados': {
+    title: 'Empleados',
     authOnly: true,
     showInSidebar: true,
-    resource: 'customers',
+    resource: 'employees',
   },
 
   '/admin/ajustes': { title: 'Ajustes', authOnly: true, showInSidebar: true },

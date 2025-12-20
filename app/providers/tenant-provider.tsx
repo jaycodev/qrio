@@ -29,9 +29,9 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
   const [branchId, setBranchId] = React.useState<number | null>(null)
   const [branches, setBranches] = React.useState<BranchList[]>([])
   const [restaurant, setRestaurant] = React.useState<RestaurantDetail | undefined>(undefined)
-  const [user, setUser] = React.useState<Pick<MeResponse, 'id' | 'email' | 'name' | 'role'> | undefined>(
-    undefined
-  )
+  const [user, setUser] = React.useState<
+    Pick<MeResponse, 'id' | 'email' | 'name' | 'role'> | undefined
+  >(undefined)
 
   const load = React.useCallback(async () => {
     console.log('[TenantProvider] load() start')
@@ -43,10 +43,18 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
       setUser({ id: me.id, email: me.email, name: me.name, role: me.role })
       setRestaurantId(me.restaurantId ?? null)
       setBranchId(me.branchId ?? null)
-      console.log('[TenantProvider] set ids -> restaurantId:', me.restaurantId ?? null, 'branchId:', me.branchId ?? null)
+      console.log(
+        '[TenantProvider] set ids -> restaurantId:',
+        me.restaurantId ?? null,
+        'branchId:',
+        me.branchId ?? null
+      )
 
       if (me.restaurantId) {
-        console.log('[TenantProvider] fetching restaurant and branches for restaurantId:', me.restaurantId)
+        console.log(
+          '[TenantProvider] fetching restaurant and branches for restaurantId:',
+          me.restaurantId
+        )
         const [restRes, brsRes] = await Promise.allSettled([
           restaurantsApi.getById(me.restaurantId),
           branchesApi.getAll(me.restaurantId),
@@ -80,7 +88,14 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
       console.error('[TenantProvider] load() error:', error)
     } finally {
       setLoading(false)
-      console.log('[TenantProvider] load() end; current state -> restaurantId:', restaurantId, 'branchId:', branchId, 'branchesCount:', branches.length)
+      console.log(
+        '[TenantProvider] load() end; current state -> restaurantId:',
+        restaurantId,
+        'branchId:',
+        branchId,
+        'branchesCount:',
+        branches.length
+      )
     }
   }, [])
 

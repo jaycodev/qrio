@@ -1,4 +1,4 @@
-"use client"
+'use client'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 
@@ -23,8 +23,17 @@ export function DashboardPage() {
   const canBranch = !!tenant.branchId
 
   const { data: stats, isLoading } = useQuery({
-    queryKey: ['dashboard', 'stats', mode, tenant.restaurantId, tenant.branchId, tenant.branches.length],
-    enabled: tenant.loading === false && (!!tenant.branchId || (!!tenant.restaurantId && tenant.branches.length > 0)),
+    queryKey: [
+      'dashboard',
+      'stats',
+      mode,
+      tenant.restaurantId,
+      tenant.branchId,
+      tenant.branches.length,
+    ],
+    enabled:
+      tenant.loading === false &&
+      (!!tenant.branchId || (!!tenant.restaurantId && tenant.branches.length > 0)),
     queryFn: async () => {
       if (mode === 'branch' && tenant.branchId) {
         return getBranchStats(tenant.branchId)
@@ -42,7 +51,10 @@ export function DashboardPage() {
     },
   })
 
-  const pieData = Object.entries(stats?.statusBreakdown ?? {}).map(([status, value]) => ({ status, value }))
+  const pieData = Object.entries(stats?.statusBreakdown ?? {}).map(([status, value]) => ({
+    status,
+    value,
+  }))
 
   return (
     <>
@@ -52,9 +64,18 @@ export function DashboardPage() {
             {mode === 'branch' && tenant.branchId ? 'Sucursal actual' : 'Todas las sucursales'}
           </div>
           {isAdmin ? (
-            <ToggleGroup type="single" value={mode} onValueChange={(v) => v && setMode(v as any)} variant="outline">
-              <ToggleGroupItem value="branch" disabled={!canBranch}>Sucursal</ToggleGroupItem>
-              <ToggleGroupItem value="restaurant" disabled={!canRestaurant}>Restaurante</ToggleGroupItem>
+            <ToggleGroup
+              type="single"
+              value={mode}
+              onValueChange={(v) => v && setMode(v as any)}
+              variant="outline"
+            >
+              <ToggleGroupItem value="branch" disabled={!canBranch}>
+                Sucursal
+              </ToggleGroupItem>
+              <ToggleGroupItem value="restaurant" disabled={!canRestaurant}>
+                Restaurante
+              </ToggleGroupItem>
             </ToggleGroup>
           ) : null}
         </div>
@@ -74,7 +95,11 @@ export function DashboardPage() {
           )}
 
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-            <ChartPieLegend data={pieData} title="Estados de pedidos" description="Distribución por estado" />
+            <ChartPieLegend
+              data={pieData}
+              title="Estados de pedidos"
+              description="Distribución por estado"
+            />
             <ChartRadarDots />
             <ChartBarMixed />
           </div>

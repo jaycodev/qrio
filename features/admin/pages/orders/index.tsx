@@ -10,6 +10,7 @@ import { TableListLayout } from '@admin/components/shared/table-list-layout'
 import { useFilterOptions } from '@/hooks/use-filter-options'
 import { useListQuery } from '@/hooks/use-list-query'
 import { ordersApi } from '@/lib/api/orders'
+import { useTenant } from '@/app/providers/tenant-provider'
 import { OrderFilterOptions } from '@/lib/schemas/order/order.filter.options.schema'
 import type { OrderList } from '@/lib/schemas/order/order.list.schema'
 
@@ -22,10 +23,15 @@ interface Props {
 }
 
 export function OrdersPage({ title, pathname, resource }: Props) {
-  const { data, error } = useListQuery<OrderList[]>(pathname, [resource], () => ordersApi.getAll(1))
+  const tenant = useTenant()
+  const { data, error } = useListQuery<OrderList[]>(
+    pathname,
+    [resource, String(tenant.branchId ?? '')],
+    () => ordersApi.getAll(tenant.branchId ?? 0)
+  )
   const { data: filterOptions } = useFilterOptions<OrderFilterOptions>(
-    ['orders-filter-options'],
-    () => ordersApi.getFilterOptions(1)
+    ['orders-filter-options', String(tenant.branchId ?? '')],
+    () => ordersApi.getFilterOptions(tenant.branchId ?? 0)
   )
   const queryClient = useQueryClient()
 
