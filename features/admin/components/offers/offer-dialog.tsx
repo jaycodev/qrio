@@ -6,6 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import { useTenant } from '@/app/providers/tenant-provider'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -18,8 +20,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
 import {
   Select,
   SelectContent,
@@ -27,7 +27,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { offersApi } from '@/lib/api/offers'
 import { productsApi } from '@/lib/api/products'
+import type { OfferDetail } from '@/lib/schemas/offers/offers.detail.schema'
 
 type CatalogProduct = {
   id: number
@@ -40,7 +43,7 @@ type CatalogProduct = {
 const offerSchema = z.object({
   title: z.string().min(1, 'El título es requerido'),
   description: z.string().optional(),
-  offerDiscountPercentage: z.number().min(0),
+  offerDiscountPercentage: z.number().gt(0, 'Ingrese un descuento mayor a 0'),
   active: z.boolean(),
   products: z
     .array(
@@ -60,8 +63,10 @@ interface OfferDialogProps {
 }
 
 export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: OfferDialogProps) {
+  const tenant = useTenant()
   const form = useForm<OfferFormValues>({
     resolver: zodResolver(offerSchema),
+    mode: 'onChange',
     defaultValues: {
       title: initialValues?.title ?? '',
       description: initialValues?.description ?? '',
@@ -71,8 +76,23 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
     },
   })
 
+  // Resetear el formulario al abrir en modo crear/editar con los valores iniciales (incluye productos)
+  React.useEffect(() => {
+    if (open && mode !== 'details') {
+      form.reset({
+        title: initialValues?.title ?? '',
+        description: initialValues?.description ?? '',
+        offerDiscountPercentage: (initialValues?.offerDiscountPercentage as number) ?? 0,
+        active: initialValues?.active ?? true,
+        products: initialValues?.products ?? [],
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, mode, initialValues])
+
   const [catalog, setCatalog] = React.useState<CatalogProduct[]>([])
   const [loadingProducts, setLoadingProducts] = React.useState(false)
+  const [loadingDetail, setLoadingDetail] = React.useState(false)
   const [submitting, setSubmitting] = React.useState(false)
   const [search, setSearch] = React.useState('')
   const [categoryFilter, setCategoryFilter] = React.useState<string>('all')
@@ -80,12 +100,14 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
   const productsSelected = form.watch('products')
   const PAGE_SIZE = 3
   const [page, setPage] = React.useState(1)
+  const [detail, setDetail] = React.useState<OfferDetail | null>(null)
 
   React.useEffect(() => {
     let mounted = true
     setLoadingProducts(true)
+    const bId = tenant.branchId ?? 0
     productsApi
-      .getAll(1)
+      .getAll(bId)
       .then((products) => {
         if (mounted)
           setCatalog(
@@ -102,13 +124,35 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
     return () => {
       mounted = false
     }
-  }, [])
+  }, [tenant.branchId])
+
+  // Load offer detail in read-only mode
+  React.useEffect(() => {
+    let mounted = true
+    if (open && mode === 'details' && initialValues?.id) {
+      setLoadingDetail(true)
+      offersApi
+        .getById(initialValues.id)
+        .then((d) => {
+          if (mounted) setDetail(d)
+        })
+        .finally(() => mounted && setLoadingDetail(false))
+    } else {
+      setDetail(null)
+    }
+    return () => {
+      mounted = false
+    }
+  }, [open, mode, initialValues?.id])
 
   const addProduct = (productId: number, qty?: number) => {
     const products = form.getValues('products')
     if (products.find((p) => p.productId === productId)) return
     const quantity = Math.max(1, Number(qty ?? qtyByProduct[productId] ?? 1))
-    form.setValue('products', [...products, { productId, quantity }])
+    form.setValue('products', [...products, { productId, quantity }], {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
     setQtyByProduct((prev) => ({ ...prev, [productId]: 1 }))
   }
 
@@ -117,14 +161,22 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
       'products',
       form
         .getValues('products')
-        .map((p) => (p.productId === productId ? { ...p, quantity: qty } : p))
+        .map((p) => (p.productId === productId ? { ...p, quantity: qty } : p)),
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      }
     )
   }
 
   const removeProduct = (productId: number) => {
     form.setValue(
       'products',
-      form.getValues('products').filter((p) => p.productId !== productId)
+      form.getValues('products').filter((p) => p.productId !== productId),
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      }
     )
   }
 
@@ -146,6 +198,12 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
       if (p.category) map.set(p.category.id, p.category.name)
     }
     return Array.from(map.entries()).map(([id, name]) => ({ id, name }))
+  }, [catalog])
+
+  const productMap = React.useMemo(() => {
+    const map = new Map<number, CatalogProduct>()
+    for (const p of catalog) map.set(p.id, p)
+    return map
   }, [catalog])
 
   const filteredCatalog = React.useMemo(() => {
@@ -187,139 +245,173 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <div className="grid gap-4 md:grid-cols-3">
-              {/* Izquierda: filtros + productos */}
+              {/* Izquierda: catálogo o detalle (solo lectura) */}
               <div className="md:col-span-2 space-y-3">
                 <div className="font-medium">Productos</div>
-                {/* Filtros */}
-                <div className="flex flex-wrap items-center gap-2">
-                  <Input
-                    placeholder="Buscar por nombre"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="w-64"
-                    disabled={readOnly}
-                  />
-                  <Select
-                    value={categoryFilter}
-                    onValueChange={setCategoryFilter}
-                    disabled={readOnly}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Categoría" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todas las categorías</SelectItem>
-                      {categories.map((c) => (
-                        <SelectItem key={c.id} value={String(c.id)}>
-                          {c.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Paginación */}
-                <div className="flex items-center justify-between gap-2">
-                  <div className="text-sm text-muted-foreground">
-                    Página {page} de {pageCount}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-8 px-2"
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      disabled={readOnly || page === 1}
-                    >
-                      Anterior
-                    </Button>
-                    {Array.from({ length: pageCount }, (_, i) => i + 1).map((n) => (
-                      <Button
-                        key={n}
-                        type="button"
-                        variant={n === page ? 'default' : 'outline'}
-                        className="h-8 px-2"
-                        onClick={() => setPage(n)}
-                        disabled={readOnly}
-                      >
-                        {n}
-                      </Button>
-                    ))}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-8 px-2"
-                      onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
-                      disabled={readOnly || page === pageCount}
-                    >
-                      Siguiente
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Grid de cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {loadingProducts ? (
-                    <div className="text-sm text-muted-foreground">Cargando productos...</div>
-                  ) : filteredCatalog.length === 0 ? (
-                    <div className="text-sm text-muted-foreground">Sin resultados</div>
-                  ) : (
-                    currentProducts.map((p) => (
-                      <div key={p.id} className="rounded-md border p-2 space-y-2">
-                        <div className="h-28 w-full overflow-hidden rounded">
-                          <img
-                            src={p.imageUrl || '/images/placeholders/product.png'}
-                            alt={p.name}
-                            className="h-28 w-full object-cover"
-                            loading="lazy"
-                          />
-                        </div>
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0">
-                            <div className="font-medium truncate" title={p.name}>
-                              {p.name}
-                            </div>
-                            {p.category && (
-                              <Badge variant="outline" className="mt-1">
-                                {p.category.name}
-                              </Badge>
-                            )}
-                          </div>
-                          {typeof p.price === 'number' && (
-                            <Badge variant="outline" className="font-mono">
-                              S/. {p.price.toFixed(2)}
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center justify-between gap-2">
-                          <Input
-                            type="number"
-                            min={1}
-                            value={qtyByProduct[p.id] ?? 1}
-                            onChange={(e) =>
-                              setQtyByProduct((prev) => ({
-                                ...prev,
-                                [p.id]: Number(e.target.value),
-                              }))
-                            }
-                            className="w-20"
-                            disabled={readOnly}
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => addProduct(p.id, qtyByProduct[p.id])}
-                            disabled={
-                              readOnly || !!productsSelected.find((pi) => pi.productId === p.id)
-                            }
-                          >
-                            Agregar
-                          </Button>
-                        </div>
+                {readOnly ? (
+                  <div className="rounded-md border">
+                    {loadingDetail ? (
+                      <div className="p-3 text-sm text-muted-foreground">Cargando detalle...</div>
+                    ) : !detail || detail.products.length === 0 ? (
+                      <div className="p-3 text-sm text-muted-foreground">
+                        No hay productos en esta oferta
                       </div>
-                    ))
-                  )}
-                </div>
+                    ) : (
+                      <div className="divide-y max-h-[420px] overflow-y-auto">
+                        {detail.products.map((item) => {
+                          const p = productMap.get(item.productId)
+                          return (
+                            <div key={item.productId} className="flex items-center gap-3 p-2">
+                              <img
+                                src={p?.imageUrl || '/images/placeholders/product.png'}
+                                alt={p?.name || 'Producto'}
+                                className="h-12 w-12 rounded object-cover border"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium truncate">
+                                  {p?.name ?? `Producto #${item.productId}`}
+                                </div>
+                                {p?.category && (
+                                  <div className="text-xs text-muted-foreground">
+                                    {p.category.name}
+                                  </div>
+                                )}
+                              </div>
+                              <Badge variant="outline" className="font-mono">
+                                x{item.quantity}
+                              </Badge>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    {/* Filtros */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Input
+                        placeholder="Buscar por nombre"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="w-64"
+                        disabled={readOnly}
+                      />
+                      <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Categoría" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todas las categorías</SelectItem>
+                          {categories.map((c) => (
+                            <SelectItem key={c.id} value={String(c.id)}>
+                              {c.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Paginación */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="text-sm text-muted-foreground">
+                        Página {page} de {pageCount}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="h-8 px-2"
+                          onClick={() => setPage((p) => Math.max(1, p - 1))}
+                          disabled={page === 1}
+                        >
+                          Anterior
+                        </Button>
+                        {Array.from({ length: pageCount }, (_, i) => i + 1).map((n) => (
+                          <Button
+                            key={n}
+                            type="button"
+                            variant={n === page ? 'default' : 'outline'}
+                            className="h-8 px-2"
+                            onClick={() => setPage(n)}
+                          >
+                            {n}
+                          </Button>
+                        ))}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="h-8 px-2"
+                          onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+                          disabled={page === pageCount}
+                        >
+                          Siguiente
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Grid de cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {loadingProducts ? (
+                        <div className="text-sm text-muted-foreground">Cargando productos...</div>
+                      ) : filteredCatalog.length === 0 ? (
+                        <div className="text-sm text-muted-foreground">Sin resultados</div>
+                      ) : (
+                        currentProducts.map((p) => (
+                          <div key={p.id} className="rounded-md border p-2 space-y-2">
+                            <div className="h-28 w-full overflow-hidden rounded">
+                              <img
+                                src={p.imageUrl || '/images/placeholders/product.png'}
+                                alt={p.name}
+                                className="h-28 w-full object-cover"
+                                loading="lazy"
+                              />
+                            </div>
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0">
+                                <div className="font-medium truncate" title={p.name}>
+                                  {p.name}
+                                </div>
+                                {p.category && (
+                                  <Badge variant="outline" className="mt-1">
+                                    {p.category.name}
+                                  </Badge>
+                                )}
+                              </div>
+                              {typeof p.price === 'number' && (
+                                <Badge variant="outline" className="font-mono">
+                                  S/. {p.price.toFixed(2)}
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex items-center justify-between gap-2">
+                              <Input
+                                type="number"
+                                min={1}
+                                value={qtyByProduct[p.id] ?? 1}
+                                onChange={(e) =>
+                                  setQtyByProduct((prev) => ({
+                                    ...prev,
+                                    [p.id]: Number(e.target.value),
+                                  }))
+                                }
+                                className="w-20"
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => addProduct(p.id, qtyByProduct[p.id])}
+                                disabled={!!productsSelected.find((pi) => pi.productId === p.id)}
+                              >
+                                Agregar
+                              </Button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Derecha: formulario + cesto */}
@@ -393,55 +485,92 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
                   </div>
                 </div>
 
-                <div className="space-y-2 rounded-md border p-3">
-                  <div className="font-medium">Cesto ({productsSelected.length})</div>
-                  {productsSelected.length === 0 ? (
-                    <div className="text-sm text-muted-foreground">
-                      No hay productos en el cesto
-                    </div>
-                  ) : (
-                    <div className="rounded-md border divide-y max-h-64 overflow-y-auto">
-                      {productsSelected.map((item) => {
-                        const p = catalog.find((c) => c.id === item.productId)
-                        return (
-                          <div key={item.productId} className="flex items-center gap-3 p-2">
-                            <img
-                              src={p?.imageUrl || '/images/placeholders/product.png'}
-                              alt={p?.name || 'Producto'}
-                              className="h-12 w-12 rounded object-cover border"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <div className="font-medium truncate">{p?.name ?? 'Producto'}</div>
-                              {p?.category && (
-                                <div className="text-xs text-muted-foreground">
-                                  {p.category.name}
-                                </div>
-                              )}
+                {readOnly ? (
+                  <div className="space-y-2 rounded-md border p-3">
+                    <div className="font-medium">Productos de la oferta</div>
+                    {loadingDetail ? (
+                      <div className="text-sm text-muted-foreground">Cargando detalle...</div>
+                    ) : !detail || detail.products.length === 0 ? (
+                      <div className="text-sm text-muted-foreground">
+                        No hay productos en esta oferta
+                      </div>
+                    ) : (
+                      <div className="rounded-md border divide-y max-h-64 overflow-y-auto">
+                        {detail.products.map((item) => {
+                          const p = productMap.get(item.productId)
+                          return (
+                            <div key={item.productId} className="flex items-center gap-3 p-2">
+                              <img
+                                src={p?.imageUrl || '/images/placeholders/product.png'}
+                                alt={p?.name || 'Producto'}
+                                className="h-12 w-12 rounded object-cover border"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium truncate">{p?.name ?? 'Producto'}</div>
+                                {p?.category && (
+                                  <div className="text-xs text-muted-foreground">
+                                    {p.category.name}
+                                  </div>
+                                )}
+                              </div>
+                              <Badge variant="outline" className="font-mono">
+                                x{item.quantity}
+                              </Badge>
                             </div>
-                            <Input
-                              type="number"
-                              min={1}
-                              value={item.quantity}
-                              onChange={(e) =>
-                                updateQuantity(item.productId, Number(e.target.value))
-                              }
-                              className="w-20"
-                              disabled={readOnly}
-                            />
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              onClick={() => removeProduct(item.productId)}
-                              disabled={readOnly}
-                            >
-                              Quitar
-                            </Button>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-2 rounded-md border p-3">
+                    <div className="font-medium">Cesto ({productsSelected.length})</div>
+                    {productsSelected.length === 0 ? (
+                      <div className="text-sm text-muted-foreground">
+                        No hay productos en el cesto
+                      </div>
+                    ) : (
+                      <div className="rounded-md border divide-y max-h-64 overflow-y-auto">
+                        {productsSelected.map((item) => {
+                          const p = catalog.find((c) => c.id === item.productId)
+                          return (
+                            <div key={item.productId} className="flex items-center gap-3 p-2">
+                              <img
+                                src={p?.imageUrl || '/images/placeholders/product.png'}
+                                alt={p?.name || 'Producto'}
+                                className="h-12 w-12 rounded object-cover border"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium truncate">{p?.name ?? 'Producto'}</div>
+                                {p?.category && (
+                                  <div className="text-xs text-muted-foreground">
+                                    {p.category.name}
+                                  </div>
+                                )}
+                              </div>
+                              <Input
+                                type="number"
+                                min={1}
+                                value={item.quantity}
+                                onChange={(e) =>
+                                  updateQuantity(item.productId, Number(e.target.value))
+                                }
+                                className="w-20"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                onClick={() => removeProduct(item.productId)}
+                              >
+                                Quitar
+                              </Button>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -450,7 +579,14 @@ export function OfferDialog({ open, mode, initialValues, onClose, onSubmit }: Of
                 {readOnly ? 'Cerrar' : 'Cancelar'}
               </Button>
               {!readOnly && (
-                <Button type="submit" disabled={submitting}>
+                <Button
+                  type="submit"
+                  disabled={
+                    submitting ||
+                    !form.formState.isValid ||
+                    (mode === 'edit' && !form.formState.isDirty)
+                  }
+                >
                   {mode === 'create' ? 'Agregar' : 'Guardar cambios'}
                 </Button>
               )}

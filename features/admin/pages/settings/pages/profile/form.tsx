@@ -5,8 +5,10 @@ import { useEffect, useRef, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Pencil, Trash, Upload } from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -78,14 +80,10 @@ const personalSchema = z.object({
 type PhotoFormValues = z.infer<typeof photoSchema>
 type PersonalFormValues = z.infer<typeof personalSchema>
 
-const personalDefaults: Partial<PersonalFormValues> = {
-  username: 'Jason',
-  email: 'jason.vilac@gmail.com',
-  firstName: 'Jason',
-  lastName: 'Vila',
-}
+const personalDefaults: Partial<PersonalFormValues> = {}
 
 export function ProfileForm() {
+  const tenant = useTenant()
   const photoForm = useForm<PhotoFormValues>({
     resolver: zodResolver(photoSchema),
     defaultValues: { photo: null },
@@ -116,7 +114,32 @@ export function ProfileForm() {
 
   const handlePersonalSubmit = (data: PersonalFormValues) => {
     showSubmittedData(data)
+    const fullName = `${data.firstName} ${data.lastName}`.trim()
+    try {
+      tenant.updateUser({ name: fullName, email: data.email })
+      toast.success('Perfil actualizado (local)')
+    } catch (err) {
+      toast.error('No se pudo actualizar el perfil')
+    }
   }
+
+  useEffect(() => {
+    // Cargar datos del usuario autenticado en el formulario
+    if (tenant.user) {
+      const name = tenant.user.name || ''
+      const [firstName, ...rest] = name.split(' ').filter(Boolean)
+      const lastName = rest.join(' ')
+      const email = tenant.user.email || ''
+      const username = email.includes('@') ? email.split('@')[0] : name || 'user'
+      personalForm.reset({
+        username,
+        email,
+        firstName: firstName || '',
+        lastName: lastName || '',
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tenant.user?.name, tenant.user?.email])
 
   useEffect(() => {
     if (photoValue instanceof File) {

@@ -3,15 +3,18 @@
 import { useMemo, useState } from 'react'
 
 import { useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 
 import { OfferDialog } from '@admin/components/offers/offer-dialog'
 import { TableListLayout } from '@admin/components/shared/table-list-layout'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import { useListQuery } from '@/hooks/use-list-query'
 import { offersApi } from '@/lib/api/offers'
 import type { OfferList } from '@/lib/schemas/offers/offers.list.schema'
 
 import { getColumns } from './columns'
+import { OfferRowDetail } from './row-detail'
 
 interface Props {
   title: string
@@ -20,28 +23,69 @@ interface Props {
 }
 
 export function OffersPage({ title, pathname, resource }: Props) {
-  const { data, error } = useListQuery<OfferList[]>(pathname, [resource], () => offersApi.getAll(1))
+  const tenant = useTenant()
+  const { data, error } = useListQuery<OfferList[]>(
+    pathname,
+    [resource, String(tenant.branchId ?? '')],
+    () => offersApi.getAll(tenant.branchId ?? 0)
+  )
   const queryClient = useQueryClient()
+  const router = useRouter()
 
   const [showDialog, setShowDialog] = useState(false)
   const [dialogMode, setDialogMode] = useState<'create' | 'edit' | 'details'>('create')
-  const [selected, setSelected] = useState<OfferList | undefined>(undefined)
+  const [expanded, setExpanded] = useState<Set<number>>(new Set())
+  const toggleExpand = (id: number) => {
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+  const [initialValues, setInitialValues] = useState<
+    | {
+        id?: number
+        title?: string
+        description?: string
+        offerDiscountPercentage?: number
+        active?: boolean
+        products?: { productId: number; quantity: number }[]
+      }
+    | undefined
+  >(undefined)
 
   const columns = useMemo(
     () =>
       getColumns(
-        (offer) => {
-          setSelected(offer)
+        async (offer) => {
+          // Abrir el mismo modal en modo edición, precargando detalle y productos
+          const detail = await offersApi.getById(offer.id)
+          setInitialValues({
+            id: detail.id,
+            title: detail.title,
+            description: detail.description ?? '',
+            offerDiscountPercentage: detail.offerDiscountPercentage,
+            active: detail.active,
+            products: detail.products.map((p) => ({
+              productId: p.productId,
+              quantity: p.quantity,
+            })),
+          })
           setDialogMode('edit')
           setShowDialog(true)
         },
         (offer) => {
-          setSelected(offer)
-          setDialogMode('details')
-          setShowDialog(true)
+          // Alternar despliegue de productos en la fila
+          toggleExpand(offer.id)
+        },
+        async (offer) => {
+          await offersApi.updateActive(offer.id, !offer.active)
+          await queryClient.invalidateQueries({ queryKey: [resource] })
+          await queryClient.refetchQueries({ queryKey: [resource], type: 'active' })
         }
       ),
-    []
+    [queryClient, resource]
   )
 
   if (error) {
@@ -57,8 +101,10 @@ export function OffersPage({ title, pathname, resource }: Props) {
         title={title}
         description="Gestión de ofertas especiales."
         pathname={pathname}
+        renderRowDetail={(item) => <OfferRowDetail offer={item as OfferList} />}
+        isRowExpanded={(item) => expanded.has((item as OfferList).id)}
         onAdd={() => {
-          setSelected(undefined)
+          setInitialValues(undefined)
           setDialogMode('create')
           setShowDialog(true)
         }}
@@ -66,23 +112,12 @@ export function OffersPage({ title, pathname, resource }: Props) {
       <OfferDialog
         open={showDialog}
         mode={dialogMode}
-        initialValues={
-          selected
-            ? {
-                id: selected.id,
-                title: selected.title,
-                description: selected.description,
-                offerDiscountPercentage: selected.offerDiscountPercentage,
-                active: selected.active,
-                products: [],
-              }
-            : undefined
-        }
+        initialValues={initialValues}
         onClose={() => setShowDialog(false)}
         onSubmit={async (values, id) => {
           if (dialogMode === 'create') {
             await offersApi.create({
-              restaurantId: 1,
+              restaurantId: tenant.restaurantId ?? 1,
               title: values.title,
               description: values.description,
               offerDiscountPercentage: values.offerDiscountPercentage,
@@ -99,6 +134,7 @@ export function OffersPage({ title, pathname, resource }: Props) {
             })
           }
           await queryClient.invalidateQueries({ queryKey: [resource] })
+          await queryClient.refetchQueries({ queryKey: [resource], type: 'active' })
         }}
       />
     </>

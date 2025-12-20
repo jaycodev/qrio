@@ -1,7 +1,10 @@
 import * as React from 'react'
 
 import { ChevronsUpDown, Plus } from 'lucide-react'
+import { ChefHat } from 'lucide-react'
+import { toast } from 'sonner'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,17 +20,29 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar'
 
-type TeamSwitcherProps = {
-  teams: {
-    logo: React.ElementType
-    restaurant: string
-    branch: string
-  }[]
-}
+import { AddBranchDialog } from './add-branch-dialog'
 
-export function TeamSwitcher({ teams }: TeamSwitcherProps) {
+export function TeamSwitcher() {
   const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
+  const tenant = useTenant()
+  const restaurantName = tenant.restaurant?.name ?? 'Restaurante'
+  const branches = tenant.branches
+  const activeBranch = branches.find((b) => b.id === tenant.branchId) ?? branches[0]
+
+  React.useEffect(() => {
+    console.log(
+      '[TeamSwitcher] tenant state -> restaurantId:',
+      tenant.restaurantId,
+      'branchId:',
+      tenant.branchId
+    )
+  }, [tenant.restaurantId, tenant.branchId])
+
+  React.useEffect(() => {
+    console.log('[TeamSwitcher] branches list updated; count:', branches.length, branches)
+  }, [branches])
+
+  const [openAdd, setOpenAdd] = React.useState(false)
 
   return (
     <SidebarMenu>
@@ -39,11 +54,11 @@ export function TeamSwitcher({ teams }: TeamSwitcherProps) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <activeTeam.logo className="size-5" />
+                <ChefHat className="size-5" />
               </div>
               <div className="grid flex-1 text-start text-sm leading-tight">
-                <span className="truncate font-semibold">{activeTeam.restaurant}</span>
-                <span className="truncate text-xs">{activeTeam.branch}</span>
+                <span className="truncate font-semibold">{restaurantName}</span>
+                <span className="truncate text-xs">{activeBranch?.name ?? 'Sucursal'}</span>
               </div>
               <ChevronsUpDown className="ms-auto" />
             </SidebarMenuButton>
@@ -55,25 +70,37 @@ export function TeamSwitcher({ teams }: TeamSwitcherProps) {
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-muted-foreground text-xs">
-              Negocios
+              Sucursal
             </DropdownMenuLabel>
-            {teams.map((team) => (
+            {branches.map((b) => (
               <DropdownMenuItem
-                key={`${team.restaurant}-${team.branch}`}
-                onClick={() => setActiveTeam(team)}
+                key={b.id}
+                onClick={() => {
+                  console.log('[TeamSwitcher] selecting branchId:', b.id)
+                  tenant.setBranchId(b.id)
+                }}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-sm border">
-                  <team.logo className="size-5 shrink-0" />
+                  <ChefHat className="size-5 shrink-0" />
                 </div>
                 <div className="grid flex-1 text-start text-sm leading-tight">
-                  <span className="truncate font-medium">{team.restaurant}</span>
-                  <span className="truncate text-xs">{team.branch}</span>
+                  <span className="truncate font-medium">{b.name}</span>
+                  <span className="truncate text-xs">{b.address ?? ''}</span>
                 </div>
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
+            <DropdownMenuItem
+              className="gap-2 p-2"
+              onClick={() => {
+                if (!tenant.restaurantId) {
+                  toast.error('Debes tener un restaurante para agregar sucursales')
+                  return
+                }
+                setOpenAdd(true)
+              }}
+            >
               <div className="bg-background flex size-6 items-center justify-center rounded-md border">
                 <Plus className="size-4" />
               </div>
@@ -82,6 +109,16 @@ export function TeamSwitcher({ teams }: TeamSwitcherProps) {
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
+      <AddBranchDialog
+        open={openAdd}
+        onOpenChange={setOpenAdd}
+        onCreated={(br) => {
+          console.log('[TeamSwitcher] branch created:', br)
+          tenant.refresh().then(() => {
+            tenant.setBranchId(br.id)
+          })
+        }}
+      />
     </SidebarMenu>
   )
 }

@@ -7,6 +7,7 @@ import { ThemeScript } from '@/components/shared/theme-script'
 import { Toaster } from '@/components/ui/sonner'
 
 import { QueryProvider } from './providers/query-provider'
+import { TenantProvider } from './providers/tenant-provider'
 
 import './globals.css'
 
@@ -46,16 +47,23 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} antialiased`}>
         <QueryProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            disableTransitionOnChange
-            enableColorScheme
-          >
-            <NextTopLoader color="var(--primary)" height={2} easing="linear" showSpinner={false} />
-            <Toaster duration={5000} />
-            {children}
-          </ThemeProvider>
+          <TenantProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              disableTransitionOnChange
+              enableColorScheme
+            >
+              <NextTopLoader
+                color="var(--primary)"
+                height={2}
+                easing="linear"
+                showSpinner={false}
+              />
+              <Toaster duration={5000} />
+              {children}
+            </ThemeProvider>
+          </TenantProvider>
         </QueryProvider>
       </body>
     </html>

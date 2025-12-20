@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { ProductDialog } from '@admin/components/products/product-dialog'
 import { TableListLayout } from '@admin/components/shared/table-list-layout'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import { useListQuery } from '@/hooks/use-list-query'
 import { productsApi } from '@/lib/api/products'
 import type { ProductCreate } from '@/lib/schemas/products/product.create.schema'
@@ -21,8 +22,11 @@ interface Props {
 }
 
 export function ProductsPage({ title, pathname, resource }: Props) {
-  const { data, error } = useListQuery<ProductList[]>(pathname, [resource], () =>
-    productsApi.getAll(1)
+  const tenant = useTenant()
+  const { data, error } = useListQuery<ProductList[]>(
+    pathname,
+    [resource, String(tenant.branchId ?? '')],
+    () => productsApi.getAll(tenant.branchId ?? 0)
   )
   const queryClient = useQueryClient()
 
@@ -88,9 +92,9 @@ export function ProductsPage({ title, pathname, resource }: Props) {
         onClose={() => setShowDialog(false)}
         onSubmit={async (values: ProductCreate, id?: number) => {
           if (dialogMode === 'create') {
-            await productsApi.create(values, 1)
+            await productsApi.create(values, tenant.branchId ?? 0)
           } else if (id) {
-            await productsApi.update(id, values, 1)
+            await productsApi.update(id, values, tenant.branchId ?? 0)
           }
           await queryClient.invalidateQueries({ queryKey: [resource] })
         }}

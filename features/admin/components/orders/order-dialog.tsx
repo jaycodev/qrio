@@ -6,6 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import { useTenant } from '@/app/providers/tenant-provider'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ComboBox } from '@/components/ui/combobox'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -20,7 +22,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { ordersApi } from '@/lib/api/orders'
-import { Badge } from '@/components/ui/badge'
 import { productsApi } from '@/lib/api/products'
 
 const orderSchema = z.object({
@@ -59,6 +60,7 @@ export function OrderDialog({
   onClose,
   onSubmit,
 }: OrderDialogProps) {
+  const tenant = useTenant()
   const form = useForm<OrderFormValues>({
     resolver: zodResolver(orderSchema),
     defaultValues: {
@@ -85,7 +87,7 @@ export function OrderDialog({
     let mounted = true
     setLoadingProducts(true)
     productsApi
-      .getAll(1)
+      .getAll(tenant.branchId ?? 0)
       .then((products) => {
         if (mounted) setCatalog(products.map((p) => ({ id: p.id, name: p.name, price: p.price })))
       })
@@ -93,7 +95,7 @@ export function OrderDialog({
     return () => {
       mounted = false
     }
-  }, [])
+  }, [tenant.branchId])
 
   // Cargar detalle enriquecido cuando estamos en modo detalles
   React.useEffect(() => {

@@ -32,7 +32,7 @@ setSidebar('/admin/categorias', { icon: Folder, group: 'principal' })
 setSidebar('/admin/pedidos', { icon: HandPlatter, group: 'principal' })
 setSidebar('/admin/mesas', { icon: Table2, group: 'principal' })
 setSidebar('/admin/ofertas', { icon: Percent, group: 'principal' })
-setSidebar('/admin/clientes', { icon: Users, group: 'principal' })
+setSidebar('/admin/empleados', { icon: Users, group: 'principal' })
 
 setSidebar('/admin/ajustes', { icon: Settings, group: 'otros' })
 setSidebar('/admin/centro-de-ayuda', { icon: CircleQuestionMark, group: 'otros' })

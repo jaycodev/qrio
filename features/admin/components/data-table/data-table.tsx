@@ -59,12 +59,16 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   resource: string
+  renderRowDetail?: (item: TData) => React.ReactNode
+  isRowExpanded?: (item: TData) => boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   resource,
+  renderRowDetail,
+  isRowExpanded,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -157,23 +161,31 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row, index) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                  className="table-row-animate"
-                  style={{
-                    animationDelay: `${index * 0.05}s`,
-                  }}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={cn('px-4', cell.column.columnDef.meta?.cellClass)}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                <React.Fragment key={row.id}>
+                  <TableRow
+                    data-state={row.getIsSelected() && 'selected'}
+                    className="table-row-animate"
+                    style={{
+                      animationDelay: `${index * 0.05}s`,
+                    }}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className={cn('px-4', cell.column.columnDef.meta?.cellClass)}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                  {isRowExpanded?.(row.original) && renderRowDetail && (
+                    <TableRow>
+                      <TableCell colSpan={row.getVisibleCells().length} className="bg-muted/40">
+                        {renderRowDetail(row.original)}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
               ))
             ) : (
               <TableRow>

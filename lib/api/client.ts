@@ -1,6 +1,9 @@
 import { config } from '@/config'
 import { ApiError, ApiResponse } from '@/lib/schemas/common/api-response.schema'
 
+// Evitar múltiples redirecciones por sesión expirada en la misma carga
+let sessionExpiredRedirected = false
+
 export class ApiClientError extends Error {
   constructor(
     public status: number,
@@ -35,6 +38,10 @@ export class ApiClient {
   }
 
   private async handleSessionExpired(): Promise<void> {
+    if (sessionExpiredRedirected) {
+      return
+    }
+    sessionExpiredRedirected = true
     try {
       await fetch(`${this.baseUrl}/auth/logout`, {
         method: 'POST',
@@ -46,11 +53,11 @@ export class ApiClient {
     }
     if (typeof window !== 'undefined') {
       try {
-        const url = new URL('/', window.location.origin)
+        const url = new URL('/auth/iniciar-sesion', window.location.origin)
         url.searchParams.set('session', 'expired')
         window.location.href = url.toString()
       } catch {
-        window.location.href = '/'
+        window.location.href = '/auth/iniciar-sesion?session=expired'
       }
     }
   }
@@ -58,6 +65,7 @@ export class ApiClient {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`
     const devToken = process.env.NEXT_PUBLIC_DEV_ACCESS_TOKEN
+    const isAuthEndpoint = endpoint.startsWith('/auth/')
 
     const makeRequest = async () =>
       fetch(url, {
@@ -75,7 +83,7 @@ export class ApiClient {
     // If response is not OK, try to parse error JSON; otherwise fallback to generic error
     if (!res.ok) {
       // Attempt token refresh on 401 for non-auth endpoints, then retry once
-      if (res.status === 401 && !endpoint.startsWith('/auth/')) {
+      if (res.status === 401 && !isAuthEndpoint) {
         const refreshed = await this.refreshAccessToken()
         if (refreshed) {
           res = await makeRequest()
@@ -87,8 +95,8 @@ export class ApiClient {
         }
       }
 
-      // Global redirect on expired session after refresh still fails
-      if (!res.ok && (res.status === 401 || res.status === 403)) {
+      // Global redirect on expired session after refresh still fails (avoid on /auth endpoints)
+      if (!res.ok && (res.status === 401 || res.status === 403) && !isAuthEndpoint) {
         await this.handleSessionExpired()
       }
 

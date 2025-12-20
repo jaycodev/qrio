@@ -8,6 +8,7 @@ import { DataTableRowActions } from '@admin/components/data-table/data-table-row
 
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Switch } from '@/components/ui/switch'
 import { OfferList } from '@/lib/schemas/offers/offers.list.schema'
 import { withMetaLabelFilter } from '@/lib/utils/components/with-meta-label-filter'
 import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-header'
@@ -17,7 +18,8 @@ import { statusBadges } from '../products/badged'
 
 export const getColumns = (
   onEdit?: (offer: OfferList) => void,
-  onDetails?: (offer: OfferList) => void
+  onDetails?: (offer: OfferList) => void,
+  onToggleActive?: (offer: OfferList) => void
 ): ColumnDef<OfferList>[] => {
   return [
     {
@@ -104,7 +106,7 @@ export const getColumns = (
       cell: ({ getValue }) => {
         const discount = getValue<number>()
 
-        return <span className="font-bold text-md text-white">{discount}%</span>
+        return <span className="font-bold text-md">{discount}%</span>
       },
       meta: {
         headerClass: 'text-center',
@@ -116,15 +118,16 @@ export const getColumns = (
       header: withMetaLabelHeader<OfferList>(),
       cell: ({ row }) => {
         const meta = statusBadges[row.original.active.toString() as keyof typeof statusBadges]
-
         if (!meta) return null
-        const Icon = meta.icon
-
         return (
-          <Badge variant={meta.variant}>
-            <Icon className="mr-1" />
-            {meta.label}
-          </Badge>
+          <div className="flex items-center justify-center gap-2">
+            <Switch
+              checked={row.original.active}
+              onCheckedChange={() => onToggleActive?.(row.original)}
+              aria-label="Cambiar estado"
+            />
+            <Badge variant={meta.variant}>{meta.label}</Badge>
+          </div>
         )
       },
       enableSorting: false,

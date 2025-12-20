@@ -21,6 +21,8 @@ interface TableListLayoutProps<TData, TValue> {
   filterCount?: number
   dateRangeCount?: number
   onAdd?: () => void
+  renderRowDetail?: (item: TData) => React.ReactNode
+  isRowExpanded?: (item: TData) => boolean
 }
 
 function getFilterCount<TData, TValue>(
@@ -55,6 +57,8 @@ export function TableListLayout<TData, TValue>({
   filterCount,
   dateRangeCount,
   onAdd,
+  renderRowDetail,
+  isRowExpanded,
 }: TableListLayoutProps<TData, TValue>) {
   const computedFilterCount = getFilterCount(columns, filterCount)
   const computedDateRangeCount = getDateRangeCount(columns, dateRangeCount)
@@ -99,7 +103,13 @@ export function TableListLayout<TData, TValue>({
             dateRangeCount={computedDateRangeCount}
           />
         ) : (
-          <DataTable columns={columns} data={data ?? []} resource={resource} />
+          <DataTable
+            columns={columns}
+            data={data ?? []}
+            resource={resource}
+            renderRowDetail={renderRowDetail}
+            isRowExpanded={isRowExpanded}
+          />
         )}
       </div>
     </>

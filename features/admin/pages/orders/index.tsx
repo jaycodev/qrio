@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { OrderDialog } from '@admin/components/orders/order-dialog'
 import { TableListLayout } from '@admin/components/shared/table-list-layout'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import { useFilterOptions } from '@/hooks/use-filter-options'
 import { useListQuery } from '@/hooks/use-list-query'
 import { ordersApi } from '@/lib/api/orders'
@@ -22,10 +23,15 @@ interface Props {
 }
 
 export function OrdersPage({ title, pathname, resource }: Props) {
-  const { data, error } = useListQuery<OrderList[]>(pathname, [resource], () => ordersApi.getAll(1))
+  const tenant = useTenant()
+  const { data, error } = useListQuery<OrderList[]>(
+    pathname,
+    [resource, String(tenant.branchId ?? '')],
+    () => ordersApi.getAll(tenant.branchId ?? 0)
+  )
   const { data: filterOptions } = useFilterOptions<OrderFilterOptions>(
-    ['orders-filter-options'],
-    () => ordersApi.getFilterOptions(1)
+    ['orders-filter-options', String(tenant.branchId ?? '')],
+    () => ordersApi.getFilterOptions(tenant.branchId ?? 0)
   )
   const queryClient = useQueryClient()
 
