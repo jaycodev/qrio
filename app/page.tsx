@@ -1,14 +1,9 @@
-import React from 'react'
-
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-import { RedirectIfCookie } from '@auth/components/redirect-if-cookie'
-import { LoginPage } from '@auth/pages/login'
-
 export const metadata: Metadata = {
-  title: 'Iniciar sesión',
+  title: 'Inicio',
 }
 
 export default async function Page() {
@@ -17,10 +12,5 @@ export default async function Page() {
   if (token?.value) {
     redirect('/admin')
   }
-  return (
-    <>
-      <RedirectIfCookie />
-      <LoginPage />
-    </>
-  )
+  redirect('/iniciar-sesion')
 }

@@ -15,6 +15,7 @@ import {
   FieldSeparator,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { authApi } from '@/lib/api/auth'
 import { cn } from '@/lib/utils'
 
@@ -70,43 +71,43 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
           <form className="p-6 md:p-8" onSubmit={handleSubmit}>
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
-                <h1 className="text-2xl font-bold">Welcome back</h1>
-                <p className="text-muted-foreground text-balance">Login to your Acme Inc account</p>
+                <h1 className="text-2xl font-bold">Bienvenido</h1>
+                <p className="text-muted-foreground text-balance">Inicia sesión en tu cuenta</p>
               </div>
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="email">Correo electrónico</FieldLabel>
                 <Input
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="correo@ejemplo.com"
                   autoComplete="username"
                   required
                 />
               </Field>
               <Field>
                 <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <FieldLabel htmlFor="password">Contraseña</FieldLabel>
                   <Link href="#" className="ml-auto text-sm underline-offset-2 hover:underline">
-                    Forgot your password?
+                    ¿Olvidaste tu contraseña?
                   </Link>
                 </div>
-                <Input
+                <PasswordInput
                   id="password"
                   name="password"
-                  type="password"
+                  placeholder="Contraseña"
                   autoComplete="current-password"
                   required
                 />
               </Field>
               <Field>
                 <Button type="submit" disabled={loading}>
-                  {loading ? 'Ingresando...' : 'Login'}
+                  {loading ? 'Ingresando...' : 'Iniciar sesión'}
                 </Button>
                 {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                Or continue with
+                O continúa con
               </FieldSeparator>
               <Field className="grid grid-cols-3 gap-4">
                 <Button variant="outline" type="button">
@@ -116,7 +117,7 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
                       fill="currentColor"
                     />
                   </svg>
-                  <span className="sr-only">Login with Apple</span>
+                  <span className="sr-only">Iniciar sesión con Apple</span>
                 </Button>
                 <Button variant="outline" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -125,7 +126,7 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
                       fill="currentColor"
                     />
                   </svg>
-                  <span className="sr-only">Login with Google</span>
+                  <span className="sr-only">Iniciar sesión con Google</span>
                 </Button>
                 <Button variant="outline" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -134,11 +135,11 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
                       fill="currentColor"
                     />
                   </svg>
-                  <span className="sr-only">Login with Meta</span>
+                  <span className="sr-only">Iniciar sesión con Meta</span>
                 </Button>
               </Field>
               <FieldDescription className="text-center">
-                Don&apos;t have an account? <Link href="/registrarse">Sign up</Link>
+                ¿No tienes cuenta? <Link href="/registrarse">Regístrate</Link>
               </FieldDescription>
             </FieldGroup>
           </form>
