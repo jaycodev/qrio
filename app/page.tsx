@@ -1,9 +1,11 @@
+import React from 'react'
+
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { LoginPage } from '@auth/pages/login'
-import React from 'react'
+
 import { RedirectIfCookie } from '@auth/components/redirect-if-cookie'
+import { LoginPage } from '@auth/pages/login'
 
 export const metadata: Metadata = {
   title: 'Iniciar sesión',

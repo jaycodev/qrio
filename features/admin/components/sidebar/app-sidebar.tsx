@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import {
   Sidebar,
   SidebarContent,
@@ -13,7 +14,6 @@ import {
 import { NavGroup } from './nav-group'
 import { NavUser } from './nav-user'
 import { TeamSwitcher } from './team-switcher'
-import { useTenant } from '@/app/providers/tenant-provider'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const tenant = useTenant()

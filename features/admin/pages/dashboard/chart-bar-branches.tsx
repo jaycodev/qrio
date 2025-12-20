@@ -1,11 +1,11 @@
 'use client'
 
-import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ChartConfig, ChartContainer, ChartTooltipContent } from '@/components/ui/chart'
-import { useTenant } from '@/app/providers/tenant-provider'
 import { ordersApi } from '@/lib/api/orders'
 
 type Datum = { branch: string; revenue: number }

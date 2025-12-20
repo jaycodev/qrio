@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 // Protege las rutas de admin verificando la cookie y, opcionalmente, el backend
 export async function middleware(req: NextRequest) {

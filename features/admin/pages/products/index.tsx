@@ -7,9 +7,9 @@ import { useQueryClient } from '@tanstack/react-query'
 import { ProductDialog } from '@admin/components/products/product-dialog'
 import { TableListLayout } from '@admin/components/shared/table-list-layout'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import { useListQuery } from '@/hooks/use-list-query'
 import { productsApi } from '@/lib/api/products'
-import { useTenant } from '@/app/providers/tenant-provider'
 import type { ProductCreate } from '@/lib/schemas/products/product.create.schema'
 import type { ProductList } from '@/lib/schemas/products/product.list.schema'
 

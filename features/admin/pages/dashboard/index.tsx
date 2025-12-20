@@ -1,18 +1,19 @@
 'use client'
 import { useState } from 'react'
+
 import { useQuery } from '@tanstack/react-query'
 
 import { useTenant } from '@/app/providers/tenant-provider'
+import { Spinner } from '@/components/ui/spinner'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { getBranchStats, getRestaurantStats } from '@/lib/api/stats'
 
+import { ChartBarBranches } from './chart-bar-branches'
 // Removed time-series placeholder that didn't match available data
 import { ChartBarMixed } from './chart-bar-mixed'
 import { ChartPieLegend } from './chart-pie-legend'
 import { ChartRadarDots } from './chart-radar-dots'
-import { ChartBarBranches } from './chart-bar-branches'
 import { SectionCards } from './section-cards'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { Spinner } from '@/components/ui/spinner'
 
 export function DashboardPage() {
   const tenant = useTenant()

@@ -1,9 +1,10 @@
-import { apiClient } from './client'
-import { employeeListSchema, type EmployeeList } from '@/lib/schemas/employees/employee.list.schema'
 import {
-  employeeDetailSchema,
   type EmployeeDetail,
+  employeeDetailSchema,
 } from '@/lib/schemas/employees/employee.detail.schema'
+import { type EmployeeList, employeeListSchema } from '@/lib/schemas/employees/employee.list.schema'
+
+import { apiClient } from './client'
 
 const resource = '/users/employees'
 

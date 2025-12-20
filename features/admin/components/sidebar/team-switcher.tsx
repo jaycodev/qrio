@@ -1,7 +1,10 @@
 import * as React from 'react'
 
 import { ChevronsUpDown, Plus } from 'lucide-react'
+import { ChefHat } from 'lucide-react'
+import { toast } from 'sonner'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,10 +20,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar'
 
-import { useTenant } from '@/app/providers/tenant-provider'
-import { ChefHat } from 'lucide-react'
 import { AddBranchDialog } from './add-branch-dialog'
-import { toast } from 'sonner'
 
 export function TeamSwitcher() {
   const { isMobile } = useSidebar()

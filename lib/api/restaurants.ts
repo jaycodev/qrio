@@ -1,8 +1,9 @@
-import { apiClient } from './client'
 import {
-  restaurantDetailSchema,
   type RestaurantDetail,
+  restaurantDetailSchema,
 } from '@/lib/schemas/restaurants/restaurant.detail.schema'
+
+import { apiClient } from './client'
 
 const resource = '/restaurants'
 

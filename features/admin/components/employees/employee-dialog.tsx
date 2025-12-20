@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
@@ -25,7 +26,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { employeesApi } from '@/lib/api/employees'
-import { useTenant } from '@/app/providers/tenant-provider'
 import type { EmployeeDetail } from '@/lib/schemas/employees/employee.detail.schema'
 
 const employeeCreateSchema = z.object({

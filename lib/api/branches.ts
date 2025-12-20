@@ -1,9 +1,10 @@
-import { apiClient } from './client'
-import { branchListSchema, type BranchList } from '@/lib/schemas/branches/branch.list.schema'
+import { type BranchList, branchListSchema } from '@/lib/schemas/branches/branch.list.schema'
+
 import {
-  createBranchRequestSchema,
   type CreateBranchRequest,
+  createBranchRequestSchema,
 } from '../schemas/branches/branch.create.request.schema'
+import { apiClient } from './client'
 
 const resource = '/branches'
 

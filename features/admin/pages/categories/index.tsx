@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 
 import { TableListLayout } from '@admin/components/shared/table-list-layout'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
@@ -19,7 +20,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { useListQuery } from '@/hooks/use-list-query'
 import { categoriesApi } from '@/lib/api/categories'
-import { useTenant } from '@/app/providers/tenant-provider'
 import type { CategoryList } from '@/lib/schemas/categories/category.list.schema'
 
 import { getColumns } from './columns'

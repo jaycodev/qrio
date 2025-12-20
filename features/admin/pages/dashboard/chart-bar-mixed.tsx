@@ -1,8 +1,9 @@
 'use client'
 
-import { Bar, BarChart, XAxis, YAxis } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
+import { Bar, BarChart, XAxis, YAxis } from 'recharts'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   ChartConfig,
@@ -10,7 +11,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart'
-import { useTenant } from '@/app/providers/tenant-provider'
 import { productsApi } from '@/lib/api/products'
 
 type Datum = { category: string; count: number }
