@@ -1,15 +1,19 @@
 import type { Metadata } from 'next'
 
+import { RequirementsPage } from '@admin/pages/requirements'
+
+import { pageMap } from '@/config/page-map'
+
+const PATHNAME = '/requerimientos'
+const page = pageMap[PATHNAME]
+
+const title = page.title
+const resource = page.resource!
+
 export const metadata: Metadata = {
-  title: 'Requerimientos',
+  title,
 }
 
 export default function Page() {
-  return (
-    <div className="p-6">
-      {/* EN CONSTRUCCION */}
-      <h1 className="text-2xl font-semibold">Requerimientos</h1>
-      <p className="text-muted-foreground mt-2">EN CONSTRUCCION...</p>
-    </div>
-  )
+  return <RequirementsPage title={title} pathname={PATHNAME} resource={resource} />
 }
