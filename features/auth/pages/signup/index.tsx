@@ -10,6 +10,7 @@ import {
   FieldSeparator,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { cn } from '@/lib/utils'
 
 export function SignupPage({ className, ...props }: React.ComponentProps<'div'>) {
@@ -20,36 +21,40 @@ export function SignupPage({ className, ...props }: React.ComponentProps<'div'>)
           <form className="p-6 md:p-8">
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
-                <h1 className="text-2xl font-bold">Create your account</h1>
+                <h1 className="text-2xl font-bold">Crea tu cuenta</h1>
                 <p className="text-muted-foreground text-sm text-balance">
-                  Enter your email below to create your account
+                  Ingresa tu correo abajo para crear tu cuenta
                 </p>
               </div>
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input id="email" type="email" placeholder="m@example.com" required />
+                <FieldLabel htmlFor="email">Correo electrónico</FieldLabel>
+                <Input id="email" type="email" placeholder="correo@ejemplo.com" required />
                 <FieldDescription>
-                  We&apos;ll use this to contact you. We will not share your email with anyone else.
+                  Usaremos esto para contactarte. No compartiremos tu correo con terceros.
                 </FieldDescription>
               </Field>
               <Field>
                 <Field className="grid grid-cols-2 gap-4">
                   <Field>
-                    <FieldLabel htmlFor="password">Password</FieldLabel>
-                    <Input id="password" type="password" required />
+                    <FieldLabel htmlFor="password">Contraseña</FieldLabel>
+                    <PasswordInput id="password" placeholder="Contraseña" required />
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
-                    <Input id="confirm-password" type="password" required />
+                    <FieldLabel htmlFor="confirm-password">Confirmar contraseña</FieldLabel>
+                    <PasswordInput
+                      id="confirm-password"
+                      placeholder="Confirmar contraseña"
+                      required
+                    />
                   </Field>
                 </Field>
-                <FieldDescription>Must be at least 8 characters long.</FieldDescription>
+                <FieldDescription>Debe tener al menos 8 caracteres.</FieldDescription>
               </Field>
               <Field>
-                <Button type="submit">Create Account</Button>
+                <Button type="submit">Crear cuenta</Button>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                Or continue with
+                O continúa con
               </FieldSeparator>
               <Field className="grid grid-cols-3 gap-4">
                 <Button variant="outline" type="button">
@@ -59,7 +64,7 @@ export function SignupPage({ className, ...props }: React.ComponentProps<'div'>)
                       fill="currentColor"
                     />
                   </svg>
-                  <span className="sr-only">Sign up with Apple</span>
+                  <span className="sr-only">Regístrate con Apple</span>
                 </Button>
                 <Button variant="outline" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -68,7 +73,7 @@ export function SignupPage({ className, ...props }: React.ComponentProps<'div'>)
                       fill="currentColor"
                     />
                   </svg>
-                  <span className="sr-only">Sign up with Google</span>
+                  <span className="sr-only">Regístrate con Google</span>
                 </Button>
                 <Button variant="outline" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -77,11 +82,11 @@ export function SignupPage({ className, ...props }: React.ComponentProps<'div'>)
                       fill="currentColor"
                     />
                   </svg>
-                  <span className="sr-only">Sign up with Meta</span>
+                  <span className="sr-only">Regístrate con Meta</span>
                 </Button>
               </Field>
               <FieldDescription className="text-center">
-                Already have an account? <Link href="/iniciar-sesion">Sign in</Link>
+                ¿Ya tienes una cuenta? <Link href="/iniciar-sesion">Inicia sesión</Link>
               </FieldDescription>
             </FieldGroup>
           </form>
