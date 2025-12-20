@@ -29,19 +29,6 @@ export function TeamSwitcher() {
   const branches = tenant.branches
   const activeBranch = branches.find((b) => b.id === tenant.branchId) ?? branches[0]
 
-  React.useEffect(() => {
-    console.log(
-      '[TeamSwitcher] tenant state -> restaurantId:',
-      tenant.restaurantId,
-      'branchId:',
-      tenant.branchId
-    )
-  }, [tenant.restaurantId, tenant.branchId])
-
-  React.useEffect(() => {
-    console.log('[TeamSwitcher] branches list updated; count:', branches.length, branches)
-  }, [branches])
-
   const [openAdd, setOpenAdd] = React.useState(false)
 
   return (
@@ -76,7 +63,6 @@ export function TeamSwitcher() {
               <DropdownMenuItem
                 key={b.id}
                 onClick={() => {
-                  console.log('[TeamSwitcher] selecting branchId:', b.id)
                   tenant.setBranchId(b.id)
                 }}
                 className="gap-2 p-2"
@@ -113,7 +99,6 @@ export function TeamSwitcher() {
         open={openAdd}
         onOpenChange={setOpenAdd}
         onCreated={(br) => {
-          console.log('[TeamSwitcher] branch created:', br)
           tenant.refresh().then(() => {
             tenant.setBranchId(br.id)
           })

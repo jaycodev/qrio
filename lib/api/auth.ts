@@ -16,19 +16,15 @@ export interface MeResponse {
 
 export const authApi = {
   async login(payload: LoginPayload): Promise<void> {
-    // Volver a llamar directamente al backend
-    console.log('Logging in with', payload)
     await apiClient.post('/auth/login', payload)
   },
   async adminLogin(payload: LoginPayload): Promise<void> {
-    console.log('Admin logging in with', payload)
     await apiClient.post('/auth/admin/login', payload)
   },
   async me(): Promise<MeResponse> {
     return apiClient.get<MeResponse>('/auth/me')
   },
   async logout(): Promise<void> {
-    // Volver a llamar directamente al backend
     await apiClient.post('/auth/logout')
   },
 }

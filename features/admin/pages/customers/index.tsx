@@ -2,18 +2,12 @@
 
 import { useMemo, useState } from 'react'
 
-import { useForm } from 'react-hook-form'
-
 import { CustomerDialog } from '@admin/components/customers/customer-dialog'
 import { TableListLayout } from '@admin/components/shared/table-list-layout'
 
-import { Button } from '@/components/ui/button'
 import { useListQuery } from '@/hooks/use-list-query'
 import { customerApi } from '@/lib/api/customers'
-import type {
-  CustomerList,
-  customerListSchema,
-} from '@/lib/schemas/customers/customers.list.schema'
+import type { CustomerList } from '@/lib/schemas/customers/customers.list.schema'
 
 import { getColumns } from './columns'
 
