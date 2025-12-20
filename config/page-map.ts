@@ -56,7 +56,7 @@ export const pageMap: Record<string, PageMeta> = {
   '/iniciar-sesion': { title: 'Iniciar sesión' },
   '/registrarse': { title: 'Registrarse' },
   '/iniciar-sesion-admin': { title: 'Iniciar sesión (App Admin)' },
-  '/requerimientos': { title: 'Requerimientos', authOnly: true },
+  '/requerimientos': { title: 'Requerimientos', authOnly: true, resource: 'requerimientos' },
 
   '/error/401': { title: 'Acceso no autorizado' },
   '/error/403': { title: 'Acceso denegado' },
