@@ -23,6 +23,7 @@ import {
   createBranchRequestSchema,
   type CreateBranchRequest,
 } from '@/lib/schemas/branches/branch.create.request.schema'
+import { z } from 'zod'
 import type { BranchList } from '@/lib/schemas/branches/branch.list.schema'
 
 type Props = {
@@ -31,9 +32,11 @@ type Props = {
   onCreated?: (branch: BranchList) => void
 }
 
+// Usamos tipos implícitos de React Hook Form para evitar conflictos con el resolver
+
 export function AddBranchDialog({ open, onOpenChange, onCreated }: Props) {
   const tenant = useTenant()
-  const form = useForm<Pick<CreateBranchRequest, 'name' | 'address' | 'phone' | 'schedule'>>({
+  const form = useForm({
     resolver: zodResolver(createBranchRequestSchema.omit({ restaurantId: true })),
     defaultValues: {
       name: '',
@@ -55,9 +58,9 @@ export function AddBranchDialog({ open, onOpenChange, onCreated }: Props) {
       const created = await branchesApi.create({
         restaurantId: tenant.restaurantId,
         name: values.name,
-        address: values.address ?? null,
-        phone: values.phone ?? null,
-        schedule: values.schedule ?? null,
+        address: values.address && values.address.trim() !== '' ? values.address : null,
+        phone: values.phone && values.phone.trim() !== '' ? values.phone : null,
+        schedule: values.schedule && values.schedule.trim() !== '' ? values.schedule : null,
       })
       toast.success('Sucursal creada correctamente')
       onCreated?.(created)
@@ -86,7 +89,11 @@ export function AddBranchDialog({ open, onOpenChange, onCreated }: Props) {
                 <FormItem>
                   <FormLabel>Nombre</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ej. Sucursal Centro" {...field} />
+                    <Input
+                      placeholder="Ej. Sucursal Centro"
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -99,7 +106,11 @@ export function AddBranchDialog({ open, onOpenChange, onCreated }: Props) {
                 <FormItem>
                   <FormLabel>Dirección</FormLabel>
                   <FormControl>
-                    <Input placeholder="Opcional" {...field} />
+                    <Input
+                      placeholder="Opcional"
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -112,7 +123,11 @@ export function AddBranchDialog({ open, onOpenChange, onCreated }: Props) {
                 <FormItem>
                   <FormLabel>Teléfono</FormLabel>
                   <FormControl>
-                    <Input placeholder="Opcional" {...field} />
+                    <Input
+                      placeholder="Opcional"
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -125,7 +140,11 @@ export function AddBranchDialog({ open, onOpenChange, onCreated }: Props) {
                 <FormItem>
                   <FormLabel>Horario</FormLabel>
                   <FormControl>
-                    <Input placeholder="Opcional" {...field} />
+                    <Input
+                      placeholder="Opcional"
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
