@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import type { MeResponse } from '@/lib/api/auth'
 import { authApi } from '@/lib/api/auth'
+import { ApiClientError } from '@/lib/api/client'
 import { branchesApi } from '@/lib/api/branches'
 import { restaurantsApi } from '@/lib/api/restaurants'
 import type { BranchList } from '@/lib/schemas/branches/branch.list.schema'
@@ -68,7 +69,10 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
         setBranches([])
       }
     } catch (error) {
-      console.error('[TenantProvider] load() error:', error)
+      if (error instanceof ApiClientError && (error.status === 401 || error.status === 403)) {
+      } else {
+        console.error('[TenantProvider] load() error:', error)
+      }
     } finally {
       setLoading(false)
     }
