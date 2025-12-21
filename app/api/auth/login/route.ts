@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
 
-const BACKEND = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api-qrio.onrender.com'
+import { config } from '@/config'
 
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const backendRes = await fetch(`${BACKEND}/auth/login`, {
+    const backendRes = await fetch(`${config.api.baseUrl}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
