@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
+import { Spinner } from '@/components/ui/spinner'
 import { authApi } from '@/lib/api/auth'
 import { cn } from '@/lib/utils'
 
@@ -23,6 +24,25 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const mountedRef = useRef(true)
+
+  const didRedirectRef = useRef(false)
+  const pathname = usePathname()
+  const prevPathRef = useRef(pathname)
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (didRedirectRef.current && pathname !== prevPathRef.current) {
+      didRedirectRef.current = false
+      if (mountedRef.current) setLoading(false)
+    }
+    prevPathRef.current = pathname
+  }, [pathname])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -41,14 +61,17 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
         const me = await authApi.me()
 
         if (me.role === 'DUEÑO') {
+          didRedirectRef.current = true
           router.replace('/admin')
           return
         }
         if (me.role === 'EMPLEADO') {
+          didRedirectRef.current = true
           router.replace('/admin')
           return
         }
         if (me.role === 'COCINA') {
+          didRedirectRef.current = true
           router.replace('/empleado')
           return
         }
@@ -59,8 +82,21 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
     } catch (err) {
       console.error('Login failed:', err)
       setError('Credenciales inválidas o servicio no disponible')
+      if (mountedRef.current) setLoading(false)
     } finally {
-      setLoading(false)
+      if (!didRedirectRef.current && mountedRef.current) {
+        setLoading(false)
+      }
+
+      // Fallback: if redirect doesn't complete within 15s, clear loading to avoid stuck UI
+      if (didRedirectRef.current) {
+        setTimeout(() => {
+          if (mountedRef.current && didRedirectRef.current) {
+            didRedirectRef.current = false
+            setLoading(false)
+          }
+        }, 15000)
+      }
     }
   }
 
@@ -81,7 +117,7 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
                   name="email"
                   type="email"
                   placeholder="correo@ejemplo.com"
-                  autoComplete="username"
+                  autoComplete="email"
                   required
                 />
               </Field>
@@ -102,7 +138,8 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
               </Field>
               <Field>
                 <Button type="submit" disabled={loading}>
-                  {loading ? 'Ingresando...' : 'Iniciar sesión'}
+                  {loading && <Spinner />}
+                  {loading ? 'Iniciando' : 'Iniciar sesión'}
                 </Button>
                 {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
               </Field>
