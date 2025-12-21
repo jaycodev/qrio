@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { config } from '@/config'
 import { authApi } from '@/lib/api/auth'
 
 import { Search } from './search'
@@ -18,7 +19,6 @@ export function Header() {
     try {
       await authApi.logout()
     } finally {
-      // Intento de limpieza de cookies del lado cliente (no afecta HttpOnly)
       try {
         const cookieNames = ['access_token', 'refresh_token']
         for (const name of cookieNames) {
@@ -41,7 +41,7 @@ export function Header() {
           <Button asChild variant="ghost" className="rounded-full">
             <a
               aria-label="Documentación API"
-              href="https://api-qrio.onrender.com"
+              href={config.api.baseUrl}
               target="_blank"
               rel="noopener noreferrer"
             >

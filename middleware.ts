@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import { config as appConfig } from '@/config'
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
 
@@ -15,8 +17,7 @@ export async function middleware(req: NextRequest) {
   }
 
   try {
-    const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080'
-    const res = await fetch(`${backendUrl}/auth/me`, {
+    const res = await fetch(`${appConfig.api.baseUrl}/auth/me`, {
       headers: {
         Cookie: req.headers.get('cookie') || '',
       },
