@@ -1,7 +1,6 @@
 import { config } from '@/config'
 import { ApiError, ApiResponse } from '@/lib/schemas/common/api-response.schema'
 
-// Evitar múltiples redirecciones por sesión expirada en la misma carga
 let sessionExpiredRedirected = false
 
 export class ApiClientError extends Error {
@@ -24,7 +23,9 @@ export class ApiClient {
 
   private async refreshAccessToken(): Promise<boolean> {
     try {
-      const res = await fetch(`${this.baseUrl}/auth/refresh`, {
+      const url =
+        typeof window !== 'undefined' ? '/api/auth/refresh' : `${this.baseUrl}/auth/refresh`
+      const res = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
