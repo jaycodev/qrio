@@ -88,7 +88,6 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
         setLoading(false)
       }
 
-      // Fallback: if redirect doesn't complete within 15s, clear loading to avoid stuck UI
       if (didRedirectRef.current) {
         setTimeout(() => {
           if (mountedRef.current && didRedirectRef.current) {

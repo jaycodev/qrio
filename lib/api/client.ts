@@ -43,26 +43,46 @@ export class ApiClient {
       return
     }
     sessionExpiredRedirected = true
+
     try {
-      await fetch(`${this.baseUrl}/auth/logout`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-      })
+      const refreshed = await this.refreshAccessToken()
+      if (refreshed) {
+        sessionExpiredRedirected = false
+        return
+      }
     } catch {}
+
+    try {
+      if (typeof window !== 'undefined') {
+        await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' })
+      } else {
+        await fetch(`${this.baseUrl}/auth/logout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        })
+      }
+    } catch {}
+
     if (typeof window !== 'undefined') {
       try {
-        const url = new URL('/auth/iniciar-sesion', window.location.origin)
+        const url = new URL('/iniciar-sesion', window.location.origin)
         url.searchParams.set('session', 'expired')
         window.location.href = url.toString()
       } catch {
-        window.location.href = '/auth/iniciar-sesion?session=expired'
+        window.location.href = '/iniciar-sesion?session=expired'
       }
     }
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`
+    const isBrowser = typeof window !== 'undefined'
+    let url: string
+    if (isBrowser && endpoint.startsWith('/auth/')) {
+      url = `/api${endpoint}`
+    } else {
+      url = `${this.baseUrl}${endpoint}`
+    }
     const devToken = config.dev?.accessToken
     const isAuthEndpoint = endpoint.startsWith('/auth/')
 
