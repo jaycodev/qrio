@@ -13,9 +13,14 @@ export interface MeResponse {
 }
 
 export interface UserBranchResponse {
-  id: number
-  restaurantName: string
-  branchName: string
+  restaurant?: {
+    id: number
+    name: string
+  } | null
+  branch?: {
+    id: number
+    name: string
+  } | null
 }
 
 export const authApi = {
