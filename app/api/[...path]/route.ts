@@ -2,10 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { config } from '@/config'
 
-async function forward(req: NextRequest, params?: { path?: string[] }) {
+async function forward(req: NextRequest) {
   try {
-    const path = params?.path ? params.path.join('/') : ''
     const url = new URL(req.url)
+    const pathname = url.pathname || ''
+    const segments = pathname.split('/').filter(Boolean)
+    const pathSegments = segments[0] === 'api' ? segments.slice(1) : segments
+    const path = pathSegments.join('/')
     const search = url.search ?? ''
     const target = `${config.api.baseUrl}/${path}${search}`
 
@@ -41,24 +44,24 @@ async function forward(req: NextRequest, params?: { path?: string[] }) {
   }
 }
 
-export async function GET(req: NextRequest, context: any) {
-  return forward(req, context?.params)
+export async function GET(req: NextRequest) {
+  return forward(req)
 }
 
-export async function POST(req: NextRequest, context: any) {
-  return forward(req, context?.params)
+export async function POST(req: NextRequest) {
+  return forward(req)
 }
 
-export async function PUT(req: NextRequest, context: any) {
-  return forward(req, context?.params)
+export async function PUT(req: NextRequest) {
+  return forward(req)
 }
 
-export async function PATCH(req: NextRequest, context: any) {
-  return forward(req, context?.params)
+export async function PATCH(req: NextRequest) {
+  return forward(req)
 }
 
-export async function DELETE(req: NextRequest, context: any) {
-  return forward(req, context?.params)
+export async function DELETE(req: NextRequest) {
+  return forward(req)
 }
 
 export async function OPTIONS() {
