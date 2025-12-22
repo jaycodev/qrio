@@ -24,7 +24,22 @@ export async function POST(req: Request) {
     })
 
     headers.append('Set-Cookie', `branchId=; Max-Age=0; Path=/;`)
+    headers.append('Set-Cookie', `restaurantId=; Max-Age=0; Path=/;`)
 
+    const host = req.headers.get('host') || ''
+    const proto = req.headers.get('x-forwarded-proto') || ''
+    const isSecure =
+      proto === 'https' || (!host.includes('localhost') && !host.startsWith('127.0.0.1'))
+    const secureAttr = isSecure ? ' Secure;' : ''
+
+    headers.append(
+      'Set-Cookie',
+      `access_token=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax;${secureAttr}`
+    )
+    headers.append(
+      'Set-Cookie',
+      `refresh_token=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax;${secureAttr}`
+    )
     if (backendRes.status === 204 || backendRes.status === 205) {
       return new NextResponse(null, { status: backendRes.status, headers })
     }
