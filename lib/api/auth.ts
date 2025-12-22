@@ -10,8 +10,12 @@ export interface MeResponse {
   email: string
   name: string
   role: string
-  restaurantId: number | null
-  branchId: number | null
+}
+
+export interface UserBranchResponse {
+  id: number
+  restaurantName: string
+  name: string
 }
 
 export const authApi = {
@@ -43,6 +47,14 @@ export const authApi = {
   },
   async me(): Promise<MeResponse> {
     return apiClient.get<MeResponse>('/auth/me')
+  },
+  async branches(): Promise<UserBranchResponse[]> {
+    if (typeof window !== 'undefined') {
+      const res = await fetch('/api/auth/branches', { credentials: 'same-origin' })
+      if (!res.ok) throw new Error('Failed to fetch branches')
+      return res.json()
+    }
+    return apiClient.get<UserBranchResponse[]>('/auth/branches')
   },
   async logout(): Promise<void> {
     if (typeof window !== 'undefined') {

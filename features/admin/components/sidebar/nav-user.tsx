@@ -6,6 +6,7 @@ import { Bell, ChevronsUpDown, LogOut, User } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -38,6 +39,7 @@ export function NavUser({
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
   const router = useRouter()
+  const tenant = useTenant()
 
   const handleLogoutClick = () => {
     setDropdownOpen(false)
@@ -50,6 +52,9 @@ export function NavUser({
     try {
       await authApi.logout()
     } finally {
+      try {
+        tenant.reset()
+      } catch {}
       try {
         const cookieNames = ['access_token', 'refresh_token']
         for (const name of cookieNames) {
