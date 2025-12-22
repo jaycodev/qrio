@@ -66,7 +66,12 @@ export default function BranchSelectionPage() {
       try {
         tenant.setBranchId(Number(branch.id))
       } catch {}
-      router.replace('/admin')
+      try {
+        if (typeof window !== 'undefined') window.location.href = '/admin'
+        else router.replace('/admin')
+      } catch {
+        router.replace('/admin')
+      }
     })()
   }
 

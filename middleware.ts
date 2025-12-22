@@ -4,6 +4,16 @@ import { config as appConfig } from '@/config'
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
+  try {
+    const cookieHeader = req.headers.get('cookie') || ''
+    const hasAccess = !!req.cookies.get('access_token')?.value
+    const hasRefresh = !!req.cookies.get('refresh_token')?.value
+    const branchId = req.cookies.get('branchId')?.value
+    // eslint-disable-next-line no-console
+    console.debug(
+      `[middleware] pathname=${pathname} access=${hasAccess} refresh=${hasRefresh} branchId=${branchId} cookieHeaderPresent=${cookieHeader.length > 0}`
+    )
+  } catch {}
 
   if (!pathname.startsWith('/admin')) {
     return NextResponse.next()
