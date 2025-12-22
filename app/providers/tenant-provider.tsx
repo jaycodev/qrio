@@ -47,7 +47,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
           id: b.id,
           code: null,
           restaurantId: 0,
-          name: b.name,
+          name: b.branchName,
           address: null,
           phone: null,
           schedule: null,

@@ -83,7 +83,7 @@ export default function BranchSelectionPage() {
         const mapped = data.map((b) => ({
           id: String(b.id),
           restaurantName: b.restaurantName,
-          branchName: b.name,
+          branchName: b.branchName,
         }))
         setBranches(mapped)
       })
