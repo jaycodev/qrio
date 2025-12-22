@@ -67,10 +67,9 @@ export class ApiClient {
     if (typeof window !== 'undefined') {
       try {
         const url = new URL('/iniciar-sesion', window.location.origin)
-        url.searchParams.set('session', 'expired')
         window.location.href = url.toString()
       } catch {
-        window.location.href = '/iniciar-sesion?session=expired'
+        window.location.href = '/iniciar-sesion'
       }
     }
   }
@@ -78,7 +77,7 @@ export class ApiClient {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const isBrowser = typeof window !== 'undefined'
     let url: string
-    if (isBrowser && endpoint.startsWith('/auth/')) {
+    if (isBrowser && endpoint.startsWith('/')) {
       url = `/api${endpoint}`
     } else {
       url = `${this.baseUrl}${endpoint}`
@@ -100,7 +99,15 @@ export class ApiClient {
     let res = await makeRequest()
 
     if (!res.ok) {
+      try {
+        // eslint-disable-next-line no-console
+        console.debug(`[ApiClient] request ${endpoint} -> ${res.status}`)
+      } catch {}
       if (res.status === 401 && !isAuthEndpoint) {
+        try {
+          // eslint-disable-next-line no-console
+          console.debug(`[ApiClient] 401 received for ${endpoint}, attempting refresh`)
+        } catch {}
         const refreshed = await this.refreshAccessToken()
         if (refreshed) {
           res = await makeRequest()
@@ -111,6 +118,10 @@ export class ApiClient {
       }
 
       if (!res.ok && (res.status === 401 || res.status === 403) && !isAuthEndpoint) {
+        try {
+          // eslint-disable-next-line no-console
+          console.debug(`[ApiClient] triggering session expired flow for ${endpoint}`)
+        } catch {}
         await this.handleSessionExpired()
       }
 

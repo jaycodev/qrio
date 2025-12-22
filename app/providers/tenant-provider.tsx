@@ -54,7 +54,8 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
           createdAt: new Date(),
         }))
         setBranches(mapped)
-        setBranchId((prev) => prev ?? (mapped.length ? mapped[0].id : null))
+        const preferred = mapped.length ? mapped[0].id : null
+        setBranchId((prev) => prev ?? preferred)
       } catch (brErr) {
         console.error('[TenantProvider] user branches fetch error:', brErr)
         setBranches([])

@@ -20,7 +20,10 @@ export async function POST(req: Request) {
 
     const headers = new Headers()
     backendRes.headers.forEach((value, key) => {
-      if (key.toLowerCase() === 'set-cookie') headers.append('Set-Cookie', value)
+      if (key.toLowerCase() === 'set-cookie') {
+        const adjusted = value.replace(/Path=\/auth/gi, 'Path=/')
+        headers.append('Set-Cookie', adjusted)
+      }
     })
 
     if (backendRes.status === 204 || backendRes.status === 205) {

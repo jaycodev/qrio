@@ -52,8 +52,27 @@ export default function BranchSelectionPage() {
   const tenant = useTenant()
 
   const handleBranchClick = (branch: Branch) => {
-    tenant.setBranchId(Number(branch.id))
-    router.replace('/admin')
+    ;(async () => {
+      try {
+        await fetch('/api/auth/set-branch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ branchId: Number(branch.id) }),
+          credentials: 'same-origin',
+        })
+      } catch (err) {
+        console.warn('Failed to set branch cookie', err)
+      }
+      try {
+        tenant.setBranchId(Number(branch.id))
+      } catch {}
+      try {
+        if (typeof window !== 'undefined') window.location.href = '/admin'
+        else router.replace('/admin')
+      } catch {
+        router.replace('/admin')
+      }
+    })()
   }
 
   const handleLogout = async () => {
