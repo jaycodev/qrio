@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react'
 
 import { ChevronsUpDown, Plus } from 'lucide-react'
@@ -29,6 +31,10 @@ export function TeamSwitcher() {
   const branches = tenant.branches
   const activeBranch = branches.find((b) => b.id === tenant.branchId) ?? branches[0]
 
+  const restaurantForActive =
+    activeBranch?.restaurantName ?? tenant.restaurant?.name ?? 'Restaurante'
+  const branchForActive = activeBranch?.name ?? 'Sucursal'
+
   const [openAdd, setOpenAdd] = React.useState(false)
 
   return (
@@ -44,14 +50,14 @@ export function TeamSwitcher() {
                 <ChefHat className="size-5" />
               </div>
               <div className="grid flex-1 text-start text-sm leading-tight">
-                <span className="truncate font-semibold">{restaurantName}</span>
-                <span className="truncate text-xs">{activeBranch?.name ?? 'Sucursal'}</span>
+                <span className="truncate font-medium">{restaurantForActive}</span>
+                <span className="truncate text-xs">{branchForActive}</span>
               </div>
               <ChevronsUpDown className="ms-auto" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg space-y-1"
             align="start"
             side={isMobile ? 'bottom' : 'right'}
             sideOffset={4}
@@ -62,6 +68,7 @@ export function TeamSwitcher() {
             {branches.map((b) => (
               <DropdownMenuItem
                 key={b.id}
+                aria-current={b.id === tenant.branchId}
                 onClick={async () => {
                   try {
                     const res = await fetch('/api/auth/set-branch', {
@@ -84,17 +91,17 @@ export function TeamSwitcher() {
                   } catch {}
 
                   try {
-                    if (typeof window !== 'undefined') window.location.href = '/admin'
+                    window.location.assign('/admin')
                   } catch {}
                 }}
-                className="gap-2 p-2"
+                className={`gap-2 p-2 ${b.id === tenant.branchId ? 'bg-muted' : ''}`}
               >
                 <div className="flex size-6 items-center justify-center rounded-sm border">
-                  <ChefHat className="size-5 shrink-0" />
+                  <ChefHat className="size-4 shrink-0" />
                 </div>
                 <div className="grid flex-1 text-start text-sm leading-tight">
-                  <span className="truncate font-medium">{b.name}</span>
-                  <span className="truncate text-xs">{b.address ?? ''}</span>
+                  <span className="truncate font-medium">{b.restaurantName ?? restaurantName}</span>
+                  <span className="truncate text-xs">{b.name}</span>
                 </div>
               </DropdownMenuItem>
             ))}

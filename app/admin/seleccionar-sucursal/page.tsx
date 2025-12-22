@@ -103,11 +103,30 @@ export default function BranchSelectionPage() {
       .branches()
       .then((data) => {
         if (!mounted) return
+        const stripPrefix = (branchName?: string, restName?: string) => {
+          if (!branchName) return ''
+          if (!restName) return branchName
+          const trimmedRest = restName.trim()
+          const trimmedBranch = branchName.trim()
+          const separators = [' - ', ' – ', ' — ', ': ', ' -', '- ']
+          for (const sep of separators) {
+            const prefix = trimmedRest + sep
+            if (trimmedBranch.startsWith(prefix)) return trimmedBranch.slice(prefix.length).trim()
+          }
+          if (trimmedBranch.toLowerCase().startsWith(trimmedRest.toLowerCase() + ' ')) {
+            return trimmedBranch
+              .slice(trimmedRest.length)
+              .replace(/^[-–—:\s]+/, '')
+              .trim()
+          }
+          return trimmedBranch
+        }
+
         const mapped = data.map((b) => ({
           id: String(b.branch?.id ?? ''),
           restaurantId: b.restaurant?.id ? String(b.restaurant.id) : undefined,
           restaurantName: b.restaurant?.name ?? '',
-          branchName: b.branch?.name ?? '',
+          branchName: stripPrefix(b.branch?.name ?? '', b.restaurant?.name ?? ''),
         }))
         setBranches(mapped)
       })
