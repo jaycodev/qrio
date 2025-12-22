@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react'
 
 import { ChevronsUpDown, Plus } from 'lucide-react'
@@ -86,6 +88,10 @@ export function TeamSwitcher() {
 
                   try {
                     tenant.setBranchId(b.id)
+                  } catch {}
+
+                  try {
+                    window.location.assign('/admin')
                   } catch {}
                 }}
                 className={`gap-2 p-2 ${b.id === tenant.branchId ? 'bg-muted' : ''}`}
