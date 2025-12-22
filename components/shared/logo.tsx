@@ -16,7 +16,7 @@ export const Logo: React.FC<LogoProps> = ({ width = 512, height = 512, className
       height={height}
       className={className}
     >
-      <rect width="512" height="512" fill="#7f22fe" rx="128" />
+      <rect width="512" height="512" fill="var(--primary)" rx="128" />
       <g
         stroke="#FFF"
         strokeLinecap="round"

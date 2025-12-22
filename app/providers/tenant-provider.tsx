@@ -4,9 +4,7 @@ import * as React from 'react'
 
 import type { MeResponse } from '@/lib/api/auth'
 import { authApi } from '@/lib/api/auth'
-import { branchesApi } from '@/lib/api/branches'
 import { ApiClientError } from '@/lib/api/client'
-import { restaurantsApi } from '@/lib/api/restaurants'
 import type { BranchList } from '@/lib/schemas/branches/branch.list.schema'
 import type { RestaurantDetail } from '@/lib/schemas/restaurants/restaurant.detail.schema'
 
@@ -20,6 +18,7 @@ type TenantState = {
   setBranchId: (id: number | null) => void
   refresh: () => Promise<void>
   updateUser: (patch: Partial<Pick<MeResponse, 'email' | 'name'>>) => void
+  reset: () => void
 }
 
 const TenantContext = React.createContext<TenantState | undefined>(undefined)
@@ -39,33 +38,25 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
     try {
       const me = await authApi.me()
       setUser({ id: me.id, email: me.email, name: me.name, role: me.role })
-      setRestaurantId(me.restaurantId ?? null)
-      setBranchId(me.branchId ?? null)
 
-      if (me.restaurantId) {
-        const [restRes, brsRes] = await Promise.allSettled([
-          restaurantsApi.getById(me.restaurantId),
-          branchesApi.getAll(me.restaurantId),
-        ])
+      setRestaurantId(null)
 
-        if (restRes.status === 'fulfilled') {
-          setRestaurant(restRes.value)
-        } else {
-          console.error('[TenantProvider] restaurant fetch error:', restRes.reason)
-          setRestaurant(undefined)
-        }
-
-        if (brsRes.status === 'fulfilled') {
-          setBranches(brsRes.value)
-          if (!me.branchId && brsRes.value.length) {
-            setBranchId(brsRes.value[0].id)
-          }
-        } else {
-          console.error('[TenantProvider] branches fetch error:', brsRes.reason)
-          setBranches([])
-        }
-      } else {
-        setRestaurant(undefined)
+      try {
+        const userBranches = await authApi.branches()
+        const mapped: BranchList[] = userBranches.map((b) => ({
+          id: b.id,
+          code: null,
+          restaurantId: 0,
+          name: b.name,
+          address: null,
+          phone: null,
+          schedule: null,
+          createdAt: new Date(),
+        }))
+        setBranches(mapped)
+        setBranchId((prev) => prev ?? (mapped.length ? mapped[0].id : null))
+      } catch (brErr) {
+        console.error('[TenantProvider] user branches fetch error:', brErr)
         setBranches([])
       }
     } catch (error) {
@@ -99,15 +90,15 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
     restaurant,
     branches,
     user,
-    setBranchId: (id) => {
-      setBranchId(id)
-    },
+    setBranchId: (id) => setBranchId(id),
     refresh: load,
-    updateUser: (patch) => {
-      setUser((prev) => {
-        const next = prev ? { ...prev, ...patch } : (undefined as any)
-        return next
-      })
+    updateUser: (patch) => setUser((prev) => (prev ? { ...prev, ...patch } : undefined)),
+    reset: () => {
+      setUser(undefined)
+      setBranchId(null)
+      setBranches([])
+      setRestaurant(undefined)
+      setRestaurantId(null)
     },
   }
 

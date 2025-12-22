@@ -23,6 +23,17 @@ export async function middleware(req: NextRequest) {
       },
     })
     if (res.ok) {
+      if (pathname === '/admin/seleccionar-sucursal') {
+        return NextResponse.next()
+      }
+
+      const branchId = req.cookies.get('branchId')?.value
+      if (!branchId) {
+        const url = req.nextUrl.clone()
+        url.pathname = '/admin/seleccionar-sucursal'
+        return NextResponse.redirect(url)
+      }
+
       return NextResponse.next()
     }
   } catch {}
