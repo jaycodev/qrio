@@ -62,8 +62,30 @@ export function TeamSwitcher() {
             {branches.map((b) => (
               <DropdownMenuItem
                 key={b.id}
-                onClick={() => {
-                  tenant.setBranchId(b.id)
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/auth/set-branch', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      credentials: 'same-origin',
+                      body: JSON.stringify({
+                        branchId: b.id,
+                        restaurantId: b.restaurantId ?? undefined,
+                      }),
+                    })
+                    if (!res.ok) throw new Error('Failed to set branch')
+                  } catch {
+                    toast.error('No se pudo cambiar de sucursal')
+                    return
+                  }
+
+                  try {
+                    tenant.setBranchId(b.id)
+                  } catch {}
+
+                  try {
+                    if (typeof window !== 'undefined') window.location.href = '/admin'
+                  } catch {}
                 }}
                 className="gap-2 p-2"
               >

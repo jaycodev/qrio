@@ -44,10 +44,10 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
       try {
         const userBranches = await authApi.branches()
         const mapped: BranchList[] = userBranches.map((b) => ({
-          id: b.id,
+          id: b.branch?.id ?? 0,
           code: null,
-          restaurantId: 0,
-          name: b.branchName,
+          restaurantId: b.restaurant?.id ?? 0,
+          name: b.branch?.name ?? '',
           address: null,
           phone: null,
           schedule: null,

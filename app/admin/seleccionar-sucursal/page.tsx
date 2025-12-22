@@ -26,6 +26,7 @@ import { getInitials } from '@/lib/utils'
 
 interface Branch {
   id: string
+  restaurantId?: string
   restaurantName: string
   branchName: string
 }
@@ -57,7 +58,10 @@ export default function BranchSelectionPage() {
         await fetch('/api/auth/set-branch', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ branchId: Number(branch.id) }),
+          body: JSON.stringify({
+            branchId: Number(branch.id),
+            restaurantId: branch.restaurantId ? Number(branch.restaurantId) : undefined,
+          }),
           credentials: 'same-origin',
         })
       } catch (err) {
@@ -100,9 +104,10 @@ export default function BranchSelectionPage() {
       .then((data) => {
         if (!mounted) return
         const mapped = data.map((b) => ({
-          id: String(b.id),
-          restaurantName: b.restaurantName,
-          branchName: b.branchName,
+          id: String(b.branch?.id ?? ''),
+          restaurantId: b.restaurant?.id ? String(b.restaurant.id) : undefined,
+          restaurantName: b.restaurant?.name ?? '',
+          branchName: b.branch?.name ?? '',
         }))
         setBranches(mapped)
       })

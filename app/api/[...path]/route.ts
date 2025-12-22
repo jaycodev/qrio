@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 import { config } from '@/config'
 
-async function forward(req: Request, params?: { path?: string[] }) {
+async function forward(req: NextRequest, params?: { path?: string[] }) {
   try {
     const path = params?.path ? params.path.join('/') : ''
     const url = new URL(req.url)
@@ -41,24 +41,24 @@ async function forward(req: Request, params?: { path?: string[] }) {
   }
 }
 
-export async function GET(req: Request, { params }: { params: { path?: string[] } }) {
-  return forward(req, params)
+export async function GET(req: NextRequest, context: any) {
+  return forward(req, context?.params)
 }
 
-export async function POST(req: Request, { params }: { params: { path?: string[] } }) {
-  return forward(req, params)
+export async function POST(req: NextRequest, context: any) {
+  return forward(req, context?.params)
 }
 
-export async function PUT(req: Request, { params }: { params: { path?: string[] } }) {
-  return forward(req, params)
+export async function PUT(req: NextRequest, context: any) {
+  return forward(req, context?.params)
 }
 
-export async function PATCH(req: Request, { params }: { params: { path?: string[] } }) {
-  return forward(req, params)
+export async function PATCH(req: NextRequest, context: any) {
+  return forward(req, context?.params)
 }
 
-export async function DELETE(req: Request, { params }: { params: { path?: string[] } }) {
-  return forward(req, params)
+export async function DELETE(req: NextRequest, context: any) {
+  return forward(req, context?.params)
 }
 
 export async function OPTIONS() {
