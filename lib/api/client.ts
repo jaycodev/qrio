@@ -99,15 +99,7 @@ export class ApiClient {
     let res = await makeRequest()
 
     if (!res.ok) {
-      try {
-        // eslint-disable-next-line no-console
-        console.debug(`[ApiClient] request ${endpoint} -> ${res.status}`)
-      } catch {}
       if (res.status === 401 && !isAuthEndpoint) {
-        try {
-          // eslint-disable-next-line no-console
-          console.debug(`[ApiClient] 401 received for ${endpoint}, attempting refresh`)
-        } catch {}
         const refreshed = await this.refreshAccessToken()
         if (refreshed) {
           res = await makeRequest()
@@ -118,10 +110,6 @@ export class ApiClient {
       }
 
       if (!res.ok && (res.status === 401 || res.status === 403) && !isAuthEndpoint) {
-        try {
-          // eslint-disable-next-line no-console
-          console.debug(`[ApiClient] triggering session expired flow for ${endpoint}`)
-        } catch {}
         await this.handleSessionExpired()
       }
 
