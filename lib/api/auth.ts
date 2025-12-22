@@ -15,7 +15,7 @@ export interface MeResponse {
 export interface UserBranchResponse {
   id: number
   restaurantName: string
-  name: string
+  branchName: string
 }
 
 export const authApi = {
