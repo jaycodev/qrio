@@ -54,7 +54,9 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
           createdAt: new Date(),
         }))
         setBranches(mapped)
-        setBranchId((prev) => prev ?? (mapped.length ? mapped[0].id : null))
+        // prefer existing branchId, otherwise pick first available
+        const preferred = mapped.length ? mapped[0].id : null
+        setBranchIdWithCookie((prev) => prev ?? preferred)
       } catch (brErr) {
         console.error('[TenantProvider] user branches fetch error:', brErr)
         setBranches([])
@@ -83,6 +85,33 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
     load()
   }, [load])
 
+  const setBranchIdWithCookie = (
+    idOrUpdater: number | null | ((prev: number | null) => number | null)
+  ) => {
+    if (typeof idOrUpdater === 'function') {
+      setBranchId((prev) => {
+        const next = (idOrUpdater as (prev: number | null) => number | null)(prev)
+        if (typeof window !== 'undefined') {
+          if (next === null) {
+            document.cookie = `branchId=; Max-Age=0; Path=/;`
+          } else {
+            document.cookie = `branchId=${next}; Path=/;`
+          }
+        }
+        return next
+      })
+    } else {
+      setBranchId(idOrUpdater)
+      if (typeof window !== 'undefined') {
+        if (idOrUpdater === null) {
+          document.cookie = `branchId=; Max-Age=0; Path=/;`
+        } else {
+          document.cookie = `branchId=${idOrUpdater}; Path=/;`
+        }
+      }
+    }
+  }
+
   const value: TenantState = {
     loading,
     restaurantId,
@@ -90,12 +119,12 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
     restaurant,
     branches,
     user,
-    setBranchId: (id) => setBranchId(id),
+    setBranchId: (id) => setBranchIdWithCookie(id),
     refresh: load,
     updateUser: (patch) => setUser((prev) => (prev ? { ...prev, ...patch } : undefined)),
     reset: () => {
       setUser(undefined)
-      setBranchId(null)
+      setBranchIdWithCookie(null)
       setBranches([])
       setRestaurant(undefined)
       setRestaurantId(null)

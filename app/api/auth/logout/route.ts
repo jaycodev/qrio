@@ -23,6 +23,8 @@ export async function POST(req: Request) {
       if (key.toLowerCase() === 'set-cookie') headers.append('Set-Cookie', value)
     })
 
+    headers.append('Set-Cookie', `branchId=; Max-Age=0; Path=/;`)
+
     if (backendRes.status === 204 || backendRes.status === 205) {
       return new NextResponse(null, { status: backendRes.status, headers })
     }
