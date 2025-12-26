@@ -62,7 +62,7 @@ export const authApi = {
     return apiClient.get<UserBranchResponse[]>('/auth/branches')
   },
   async logout(): Promise<void> {
-     if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') {
       const res = await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' })
       if (!res.ok) throw new Error('Logout failed')
       return
