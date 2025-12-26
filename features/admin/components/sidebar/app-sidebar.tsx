@@ -22,7 +22,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const filteredNavGroups = rawSidebarData.navGroups.map((group: any) => ({
     ...group,
     items: group.items.filter((item: any) => {
-      // Ocultar empleados para roles COCINA y EMPLEADO
       if (role === 'COCINA' || role === 'EMPLEADO') {
         return item.url !== '/admin/empleados'
       }

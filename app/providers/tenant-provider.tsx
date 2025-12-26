@@ -4,8 +4,7 @@ import * as React from 'react'
 
 import type { MeResponse } from '@/lib/api/auth'
 import { authApi } from '@/lib/api/auth'
-import { branchesApi } from '@/lib/api/branches'
-import { restaurantsApi } from '@/lib/api/restaurants'
+import { ApiClientError } from '@/lib/api/client'
 import type { BranchList } from '@/lib/schemas/branches/branch.list.schema'
 import type { RestaurantDetail } from '@/lib/schemas/restaurants/restaurant.detail.schema'
 
@@ -14,11 +13,12 @@ type TenantState = {
   restaurantId: number | null
   branchId: number | null
   restaurant?: RestaurantDetail
-  branches: BranchList[]
+  branches: (BranchList & { restaurantName?: string })[]
   user?: Pick<MeResponse, 'id' | 'email' | 'name' | 'role'>
   setBranchId: (id: number | null) => void
   refresh: () => Promise<void>
   updateUser: (patch: Partial<Pick<MeResponse, 'email' | 'name'>>) => void
+  reset: () => void
 }
 
 const TenantContext = React.createContext<TenantState | undefined>(undefined)
@@ -27,101 +27,93 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = React.useState(true)
   const [restaurantId, setRestaurantId] = React.useState<number | null>(null)
   const [branchId, setBranchId] = React.useState<number | null>(null)
-  const [branches, setBranches] = React.useState<BranchList[]>([])
+  const [branches, setBranches] = React.useState<(BranchList & { restaurantName?: string })[]>([])
   const [restaurant, setRestaurant] = React.useState<RestaurantDetail | undefined>(undefined)
   const [user, setUser] = React.useState<
     Pick<MeResponse, 'id' | 'email' | 'name' | 'role'> | undefined
   >(undefined)
 
   const load = React.useCallback(async () => {
-    console.log('[TenantProvider] load() start')
     setLoading(true)
     try {
-      console.log('[TenantProvider] fetching /auth/me')
       const me = await authApi.me()
-      console.log('[TenantProvider] /auth/me result:', me)
       setUser({ id: me.id, email: me.email, name: me.name, role: me.role })
-      setRestaurantId(me.restaurantId ?? null)
-      setBranchId(me.branchId ?? null)
-      console.log(
-        '[TenantProvider] set ids -> restaurantId:',
-        me.restaurantId ?? null,
-        'branchId:',
-        me.branchId ?? null
-      )
 
-      if (me.restaurantId) {
-        console.log(
-          '[TenantProvider] fetching restaurant and branches for restaurantId:',
-          me.restaurantId
-        )
-        const [restRes, brsRes] = await Promise.allSettled([
-          restaurantsApi.getById(me.restaurantId),
-          branchesApi.getAll(me.restaurantId),
-        ])
+      setRestaurantId(null)
 
-        if (restRes.status === 'fulfilled') {
-          console.log('[TenantProvider] restaurant fetched:', restRes.value)
-          setRestaurant(restRes.value)
-        } else {
-          console.error('[TenantProvider] restaurant fetch error:', restRes.reason)
-          setRestaurant(undefined)
-        }
-
-        if (brsRes.status === 'fulfilled') {
-          console.log('[TenantProvider] branches fetched count:', brsRes.value.length, brsRes.value)
-          setBranches(brsRes.value)
-          if (!me.branchId && brsRes.value.length) {
-            setBranchId(brsRes.value[0].id)
-            console.log('[TenantProvider] default branch set to:', brsRes.value[0].id)
+      try {
+        const userBranches = await authApi.branches()
+        const stripPrefix = (branchName?: string, restName?: string) => {
+          if (!branchName) return ''
+          if (!restName) return branchName
+          const trimmedRest = restName.trim()
+          const trimmedBranch = branchName.trim()
+          const separators = [' - ', ' – ', ' — ', ': ', ' -', '- ']
+          for (const sep of separators) {
+            const prefix = trimmedRest + sep
+            if (trimmedBranch.startsWith(prefix)) return trimmedBranch.slice(prefix.length).trim()
           }
-        } else {
-          console.error('[TenantProvider] branches fetch error:', brsRes.reason)
-          setBranches([])
+          if (trimmedBranch.toLowerCase().startsWith(trimmedRest.toLowerCase() + ' ')) {
+            return trimmedBranch
+              .slice(trimmedRest.length)
+              .replace(/^[-–—:\s]+/, '')
+              .trim()
+          }
+          return trimmedBranch
         }
-      } else {
-        console.log('[TenantProvider] user has no restaurantId; resetting state')
-        setRestaurant(undefined)
+
+        const mapped: (BranchList & { restaurantName?: string })[] = userBranches.map((b) => ({
+          id: b.branch?.id ?? 0,
+          name: stripPrefix(b.branch?.name ?? '', b.restaurant?.name ?? ''),
+          address: null,
+          phone: null,
+          schedule: null,
+          createdAt: new Date(),
+          restaurantName: b.restaurant?.name ?? '',
+          restaurantId: b.restaurant?.id ?? 0,
+          code: null,
+        }))
+        setBranches(mapped)
+        const preferred = mapped.length ? mapped[0].id : null
+        setBranchId((prev) => prev ?? preferred)
+
+        const firstRestaurant = userBranches[0]?.restaurant
+        if (firstRestaurant) {
+          setRestaurantId(firstRestaurant.id ?? null)
+          try {
+            setRestaurant({
+              id: firstRestaurant.id,
+              name: firstRestaurant.name ?? '',
+            } as unknown as RestaurantDetail)
+          } catch {}
+        }
+      } catch (brErr) {
+        console.error('[TenantProvider] user branches fetch error:', brErr)
         setBranches([])
       }
     } catch (error) {
-      console.error('[TenantProvider] load() error:', error)
+      if (error instanceof ApiClientError && (error.status === 401 || error.status === 403)) {
+      } else {
+        console.error('[TenantProvider] load() error:', error)
+      }
     } finally {
       setLoading(false)
-      console.log(
-        '[TenantProvider] load() end; current state -> restaurantId:',
-        restaurantId,
-        'branchId:',
-        branchId,
-        'branchesCount:',
-        branches.length
-      )
     }
   }, [])
 
   React.useEffect(() => {
-    console.log('[TenantProvider] effect mount -> initiating load')
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href)
       const path = url.pathname
       const expired = url.searchParams.get('session') === 'expired'
       const isAuthPage = path.startsWith('/auth')
       if (expired || isAuthPage) {
-        console.log('[TenantProvider] on auth/expired page; skipping load')
         setLoading(false)
         return
       }
     }
     load()
   }, [load])
-
-  React.useEffect(() => {
-    console.log('[TenantProvider] branchId changed:', branchId)
-  }, [branchId])
-
-  React.useEffect(() => {
-    console.log('[TenantProvider] branches updated -> count:', branches.length, branches)
-  }, [branches])
 
   const value: TenantState = {
     loading,
@@ -131,16 +123,20 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
     branches,
     user,
     setBranchId: (id) => {
-      console.log('[TenantProvider] setBranchId called with:', id)
       setBranchId(id)
+      try {
+        const b = branches.find((x) => x.id === id)
+        if (b) setRestaurantId(b.restaurantId ?? null)
+      } catch {}
     },
     refresh: load,
-    updateUser: (patch) => {
-      setUser((prev) => {
-        const next = prev ? { ...prev, ...patch } : (undefined as any)
-        console.log('[TenantProvider] updateUser patch:', patch, 'result:', next)
-        return next
-      })
+    updateUser: (patch) => setUser((prev) => (prev ? { ...prev, ...patch } : undefined)),
+    reset: () => {
+      setUser(undefined)
+      setBranchId(null)
+      setBranches([])
+      setRestaurant(undefined)
+      setRestaurantId(null)
     },
   }
 

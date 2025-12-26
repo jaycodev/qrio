@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -15,6 +15,8 @@ import {
   FieldSeparator,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
+import { Spinner } from '@/components/ui/spinner'
 import { authApi } from '@/lib/api/auth'
 import { cn } from '@/lib/utils'
 
@@ -22,6 +24,25 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const mountedRef = useRef(true)
+
+  const didRedirectRef = useRef(false)
+  const pathname = usePathname()
+  const prevPathRef = useRef(pathname)
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (didRedirectRef.current && pathname !== prevPathRef.current) {
+      didRedirectRef.current = false
+      if (mountedRef.current) setLoading(false)
+    }
+    prevPathRef.current = pathname
+  }, [pathname])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -35,37 +56,46 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
     }
     setLoading(true)
     try {
-      console.log('Starting login request')
       await authApi.login({ email, password })
-      // Obtener el perfil del usuario para validar sesión y precargar contexto
       try {
         const me = await authApi.me()
 
         if (me.role === 'DUEÑO') {
+          didRedirectRef.current = true
           router.replace('/admin')
           return
         }
         if (me.role === 'EMPLEADO') {
+          didRedirectRef.current = true
           router.replace('/admin')
           return
         }
         if (me.role === 'COCINA') {
+          didRedirectRef.current = true
           router.replace('/empleado')
           return
         }
-        //console.log('User profile loaded from /auth/me:', me)
       } catch (meErr) {
         console.warn('Could not fetch /auth/me after login, proceeding anyway:', meErr)
       }
-      //console.log('Login success, forcing navigation to /admin')
-      // Navegación directa: evita depender de lectura de cookies en cliente
       return
     } catch (err) {
       console.error('Login failed:', err)
       setError('Credenciales inválidas o servicio no disponible')
+      if (mountedRef.current) setLoading(false)
     } finally {
-      console.log('Finished login attempt')
-      setLoading(false)
+      if (!didRedirectRef.current && mountedRef.current) {
+        setLoading(false)
+      }
+
+      if (didRedirectRef.current) {
+        setTimeout(() => {
+          if (mountedRef.current && didRedirectRef.current) {
+            didRedirectRef.current = false
+            setLoading(false)
+          }
+        }, 15000)
+      }
     }
   }
 
@@ -76,43 +106,44 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
           <form className="p-6 md:p-8" onSubmit={handleSubmit}>
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
-                <h1 className="text-2xl font-bold">Welcome back</h1>
-                <p className="text-muted-foreground text-balance">Login to your Acme Inc account</p>
+                <h1 className="text-2xl font-bold">Bienvenido</h1>
+                <p className="text-muted-foreground text-balance">Inicia sesión en tu cuenta</p>
               </div>
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="email">Correo electrónico</FieldLabel>
                 <Input
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="m@example.com"
-                  autoComplete="username"
+                  placeholder="correo@ejemplo.com"
+                  autoComplete="email"
                   required
                 />
               </Field>
               <Field>
                 <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <FieldLabel htmlFor="password">Contraseña</FieldLabel>
                   <Link href="#" className="ml-auto text-sm underline-offset-2 hover:underline">
-                    Forgot your password?
+                    ¿Olvidaste tu contraseña?
                   </Link>
                 </div>
-                <Input
+                <PasswordInput
                   id="password"
                   name="password"
-                  type="password"
+                  placeholder="Contraseña"
                   autoComplete="current-password"
                   required
                 />
               </Field>
               <Field>
                 <Button type="submit" disabled={loading}>
-                  {loading ? 'Ingresando...' : 'Login'}
+                  {loading && <Spinner />}
+                  {loading ? 'Iniciando' : 'Iniciar sesión'}
                 </Button>
                 {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                Or continue with
+                O continúa con
               </FieldSeparator>
               <Field className="grid grid-cols-3 gap-4">
                 <Button variant="outline" type="button">
@@ -122,7 +153,7 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
                       fill="currentColor"
                     />
                   </svg>
-                  <span className="sr-only">Login with Apple</span>
+                  <span className="sr-only">Iniciar sesión con Apple</span>
                 </Button>
                 <Button variant="outline" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -131,7 +162,7 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
                       fill="currentColor"
                     />
                   </svg>
-                  <span className="sr-only">Login with Google</span>
+                  <span className="sr-only">Iniciar sesión con Google</span>
                 </Button>
                 <Button variant="outline" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -140,11 +171,11 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
                       fill="currentColor"
                     />
                   </svg>
-                  <span className="sr-only">Login with Meta</span>
+                  <span className="sr-only">Iniciar sesión con Meta</span>
                 </Button>
               </Field>
               <FieldDescription className="text-center">
-                Don&apos;t have an account? <Link href="/registrarse">Sign up</Link>
+                ¿No tienes cuenta? <Link href="/registrarse">Regístrate</Link>
               </FieldDescription>
             </FieldGroup>
           </form>

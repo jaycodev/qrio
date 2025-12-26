@@ -118,7 +118,7 @@ export function ProfileForm() {
     try {
       tenant.updateUser({ name: fullName, email: data.email })
       toast.success('Perfil actualizado (local)')
-    } catch (err) {
+    } catch {
       toast.error('No se pudo actualizar el perfil')
     }
   }

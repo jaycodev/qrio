@@ -1,34 +1,16 @@
 'use client'
 
-import { Cloud, LogOut } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { Cloud } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
-import { authApi } from '@/lib/api/auth'
+import { config } from '@/config'
 
 import { Search } from './search'
 
 export function Header() {
-  const router = useRouter()
-
-  const handleLogout = async () => {
-    try {
-      await authApi.logout()
-    } finally {
-      // Intento de limpieza de cookies del lado cliente (no afecta HttpOnly)
-      try {
-        const cookieNames = ['access_token', 'refresh_token']
-        for (const name of cookieNames) {
-          document.cookie = `${name}=; Max-Age=0; Path=/;`
-        }
-      } catch {}
-      router.push('/iniciar-sesion')
-    }
-  }
-
   return (
     <header className="bg-background sticky inset-x-0 top-0 isolate z-10 flex shrink-0 items-center gap-2 border-b">
       <div className="flex h-14 w-full items-center gap-3 px-5">
@@ -41,7 +23,7 @@ export function Header() {
           <Button asChild variant="ghost" className="rounded-full">
             <a
               aria-label="Documentación API"
-              href="https://api-qrio.onrender.com"
+              href={config.api.baseUrl}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -68,15 +50,6 @@ export function Header() {
             </a>
           </Button>
           <ThemeToggle />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full"
-            onClick={handleLogout}
-            aria-label="Salir"
-          >
-            <LogOut />
-          </Button>
         </div>
       </div>
     </header>

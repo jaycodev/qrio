@@ -1,4 +1,4 @@
-import { CheckCircle, Clock, Loader, type LucideIcon, XCircle } from 'lucide-react'
+import { CheckCircle, type LucideIcon, XCircle } from 'lucide-react'
 
 export const statusBadges = {
   true: {

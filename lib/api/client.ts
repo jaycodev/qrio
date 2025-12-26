@@ -1,7 +1,6 @@
 import { config } from '@/config'
 import { ApiError, ApiResponse } from '@/lib/schemas/common/api-response.schema'
 
-// Evitar múltiples redirecciones por sesión expirada en la misma carga
 let sessionExpiredRedirected = false
 
 export class ApiClientError extends Error {
@@ -24,7 +23,9 @@ export class ApiClient {
 
   private async refreshAccessToken(): Promise<boolean> {
     try {
-      const res = await fetch(`${this.baseUrl}/auth/refresh`, {
+      const url =
+        typeof window !== 'undefined' ? '/api/auth/refresh' : `${this.baseUrl}/auth/refresh`
+      const res = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,29 +43,46 @@ export class ApiClient {
       return
     }
     sessionExpiredRedirected = true
+
     try {
-      await fetch(`${this.baseUrl}/auth/logout`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-      })
-    } catch {
-      // swallow errors on logout attempt
-    }
+      const refreshed = await this.refreshAccessToken()
+      if (refreshed) {
+        sessionExpiredRedirected = false
+        return
+      }
+    } catch {}
+
+    try {
+      if (typeof window !== 'undefined') {
+        await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' })
+      } else {
+        await fetch(`${this.baseUrl}/auth/logout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        })
+      }
+    } catch {}
+
     if (typeof window !== 'undefined') {
       try {
-        const url = new URL('/auth/iniciar-sesion', window.location.origin)
-        url.searchParams.set('session', 'expired')
+        const url = new URL('/iniciar-sesion', window.location.origin)
         window.location.href = url.toString()
       } catch {
-        window.location.href = '/auth/iniciar-sesion?session=expired'
+        window.location.href = '/iniciar-sesion'
       }
     }
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`
-    const devToken = process.env.NEXT_PUBLIC_DEV_ACCESS_TOKEN
+    const isBrowser = typeof window !== 'undefined'
+    let url: string
+    if (isBrowser && endpoint.startsWith('/')) {
+      url = `/api${endpoint}`
+    } else {
+      url = `${this.baseUrl}${endpoint}`
+    }
+    const devToken = config.dev?.accessToken
     const isAuthEndpoint = endpoint.startsWith('/auth/')
 
     const makeRequest = async () =>
@@ -80,22 +98,17 @@ export class ApiClient {
 
     let res = await makeRequest()
 
-    // If response is not OK, try to parse error JSON; otherwise fallback to generic error
     if (!res.ok) {
-      // Attempt token refresh on 401 for non-auth endpoints, then retry once
       if (res.status === 401 && !isAuthEndpoint) {
         const refreshed = await this.refreshAccessToken()
         if (refreshed) {
           res = await makeRequest()
           if (res.ok) {
-            // proceed to parse success body below
           } else {
-            // if still not ok, continue to error parsing below
           }
         }
       }
 
-      // Global redirect on expired session after refresh still fails (avoid on /auth endpoints)
       if (!res.ok && (res.status === 401 || res.status === 403) && !isAuthEndpoint) {
         await this.handleSessionExpired()
       }
@@ -113,15 +126,12 @@ export class ApiClient {
       }
     }
 
-    // Handle empty body (e.g., 204) gracefully
     const text = await res.text()
     if (!text) {
-      // No content: return undefined as T
       return undefined as T
     }
 
     const parsed = JSON.parse(text) as unknown
-    // If server uses unified envelope { success, data, ... }
     if (parsed && typeof parsed === 'object' && 'success' in (parsed as Record<string, unknown>)) {
       const json = parsed as ApiResponse<T>
       if (!json.success) {
@@ -130,7 +140,6 @@ export class ApiClient {
       return json.data as T
     }
 
-    // Otherwise, accept plain JSON payloads as success
     return parsed as T
   }
 

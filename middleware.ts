@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// Protege las rutas de admin verificando la cookie y, opcionalmente, el backend
+import { config as appConfig } from '@/config'
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
 
-  // Solo proteger rutas bajo /admin
   if (!pathname.startsWith('/admin')) {
     return NextResponse.next()
   }
@@ -12,26 +12,34 @@ export async function middleware(req: NextRequest) {
   const access = req.cookies.get('access_token')?.value
   if (!access) {
     const url = req.nextUrl.clone()
-    url.pathname = '/'
+    url.pathname = '/iniciar-sesion'
     return NextResponse.redirect(url)
   }
 
-  // Validación opcional contra backend: /auth/me
   try {
-    const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080'
-    const res = await fetch(`${backendUrl}/auth/me`, {
+    const res = await fetch(`${appConfig.api.baseUrl}/auth/me`, {
       headers: {
-        // Reenviamos las cookies actuales al backend
         Cookie: req.headers.get('cookie') || '',
       },
     })
     if (res.ok) {
+      if (pathname === '/admin/seleccionar-sucursal') {
+        return NextResponse.next()
+      }
+
+      const branchId = req.cookies.get('branchId')?.value
+      if (!branchId) {
+        const url = req.nextUrl.clone()
+        url.pathname = '/admin/seleccionar-sucursal'
+        return NextResponse.redirect(url)
+      }
+
       return NextResponse.next()
     }
   } catch {}
 
   const url = req.nextUrl.clone()
-  url.pathname = '/'
+  url.pathname = '/iniciar-sesion'
   return NextResponse.redirect(url)
 }
 
