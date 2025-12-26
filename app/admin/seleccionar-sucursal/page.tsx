@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { authApi } from '@/lib/api/auth'
 import { getInitials } from '@/lib/utils'
 
@@ -45,6 +46,7 @@ export default function BranchSelectionPage() {
   const [loadingBranches, setLoadingBranches] = useState(false)
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isCreateRestaurantOpen, setIsCreateRestaurantOpen] = useState(false)
   const [newBranchName, setNewBranchName] = useState('')
   const [newBranchAddress, setNewBranchAddress] = useState('')
   const [newBranchPhone, setNewBranchPhone] = useState('')
@@ -53,6 +55,8 @@ export default function BranchSelectionPage() {
 
   const [ownerRestaurants, setOwnerRestaurants] = useState<{ id: number; name: string }[]>([])
   const [loadingRestaurants, setLoadingRestaurants] = useState(false)
+  const [newRestaurantName, setNewRestaurantName] = useState('')
+  const [newRestaurantDescription, setNewRestaurantDescription] = useState('')
 
   const router = useRouter()
   const tenant = useTenant()
@@ -191,7 +195,7 @@ export default function BranchSelectionPage() {
                     Crea tu primer restaurante para comenzar a gestionar tus sucursales y optimizar
                     tu negocio
                   </p>
-                  <Button onClick={() => setIsCreateModalOpen(true)}>
+                  <Button onClick={() => setIsCreateRestaurantOpen(true)}>
                     <Plus className="size-4" />
                     Crear Restaurante
                   </Button>
@@ -374,6 +378,84 @@ export default function BranchSelectionPage() {
                 } catch (err) {
                   alert('Error al crear la sucursal')
                   console.warn('Error creating branch', err)
+                }
+              }}
+            >
+              Crear
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isCreateRestaurantOpen} onOpenChange={setIsCreateRestaurantOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Crear Nuevo Restaurante</DialogTitle>
+            <DialogDescription>
+              Ingresa el nombre del restaurante (obligatorio) y una descripción opcional.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="rest-name">
+                Nombre <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="rest-name"
+                placeholder="Ej: La Parrilla"
+                value={newRestaurantName}
+                onChange={(e) => setNewRestaurantName(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="rest-desc">Descripción</Label>
+              <Textarea
+                id="rest-desc"
+                placeholder="Descripción opcional"
+                value={newRestaurantDescription}
+                onChange={(e) => setNewRestaurantDescription(e.target.value)}
+                rows={4}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCreateRestaurantOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={async () => {
+                if (!tenant.user?.id) {
+                  alert('No se encontró usuario en sesión')
+                  return
+                }
+                if (!newRestaurantName.trim()) {
+                  alert('El nombre es obligatorio')
+                  return
+                }
+                try {
+                  const created = await restaurantsApi.create({
+                    adminId: tenant.user.id,
+                    name: newRestaurantName.trim(),
+                    description:
+                      newRestaurantDescription && newRestaurantDescription.trim() !== ''
+                        ? newRestaurantDescription
+                        : null,
+                    logoUrl: null,
+                    isActive: true,
+                  })
+                  setIsCreateRestaurantOpen(false)
+                  setNewRestaurantName('')
+                  setNewRestaurantDescription('')
+                  // refresh tenant and open create-branch modal with the new restaurant selected
+                  try {
+                    await tenant.refresh()
+                  } catch {}
+                  // set the selected restaurant for the branch modal and open it
+                  setSelectedRestaurantId(String(created.id))
+                  setIsCreateModalOpen(true)
+                } catch (err) {
+                  console.error('Error creating restaurant', err)
+                  alert('Error al crear el restaurante')
                 }
               }}
             >
