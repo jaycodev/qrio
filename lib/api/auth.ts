@@ -29,6 +29,11 @@ export const authApi = {
   },
   async logout(): Promise<void> {
     // Volver a llamar directamente al backend
-    await apiClient.post('/auth/logout')
+    // En producción puede devolver 401/403 por sesión expirada o CORS; no bloquear el flujo
+    try {
+      await apiClient.post('/auth/logout')
+    } catch (err) {
+      console.warn('[authApi.logout] Ignorando error de logout:', err)
+    }
   },
 }
