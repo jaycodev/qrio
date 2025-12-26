@@ -20,7 +20,6 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { authApi } from '@/lib/api/auth'
 import { getInitials } from '@/lib/utils'
 
@@ -31,26 +30,48 @@ interface Branch {
   branchName: string
 }
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { branchesApi } from '@/lib/api/branches'
+import { restaurantsApi } from '@/lib/api/restaurants'
+
 export default function BranchSelectionPage() {
   const [branches, setBranches] = useState<Branch[]>([])
   const [loadingBranches, setLoadingBranches] = useState(false)
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  const [newRestaurantName, setNewRestaurantName] = useState('')
-  const [newRestaurantDescription, setNewRestaurantDescription] = useState('')
+  const [newBranchName, setNewBranchName] = useState('')
+  const [newBranchAddress, setNewBranchAddress] = useState('')
+  const [newBranchPhone, setNewBranchPhone] = useState('')
+  const [newBranchSchedule, setNewBranchSchedule] = useState('')
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>('')
 
-  const handleCreateRestaurant = () => {
-    console.warn('Crear restaurante:', {
-      name: newRestaurantName,
-      description: newRestaurantDescription,
-    })
-    setIsCreateModalOpen(false)
-    setNewRestaurantName('')
-    setNewRestaurantDescription('')
-  }
+  const [ownerRestaurants, setOwnerRestaurants] = useState<{ id: number; name: string }[]>([])
+  const [loadingRestaurants, setLoadingRestaurants] = useState(false)
 
   const router = useRouter()
   const tenant = useTenant()
+
+  useEffect(() => {
+    if (!isCreateModalOpen) return
+    if (!tenant.user?.id) return
+    setLoadingRestaurants(true)
+    restaurantsApi
+      .getByOwner(tenant.user.id)
+      .then((data) => {
+        setOwnerRestaurants(data.map((r) => ({ id: r.id, name: r.name })))
+      })
+      .catch((err) => {
+        setOwnerRestaurants([])
+        console.warn('Failed to load owner restaurants', err)
+      })
+      .finally(() => setLoadingRestaurants(false))
+  }, [isCreateModalOpen, tenant.user?.id])
 
   const handleBranchClick = (branch: Branch) => {
     ;(async () => {
@@ -216,29 +237,70 @@ export default function BranchSelectionPage() {
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Crear Nuevo Restaurante</DialogTitle>
+            <DialogTitle>Crear Nueva Sucursal</DialogTitle>
             <DialogDescription>
-              Ingresa los datos de tu restaurante. Podrás agregar sucursales después.
+              Selecciona el restaurante y agrega los datos de la sucursal.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="name">Nombre</Label>
+              <Label>
+                Restaurante <span className="text-destructive">*</span>
+              </Label>
+              <Select
+                value={selectedRestaurantId}
+                onValueChange={(v) => setSelectedRestaurantId(v)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue
+                    placeholder={loadingRestaurants ? 'Cargando...' : 'Selecciona un restaurante'}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {ownerRestaurants.map((r) => (
+                    <SelectItem key={r.id} value={String(r.id)}>
+                      {r.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="name">
+                Nombre de sucursal <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="name"
-                placeholder="Ej: La Parrilla"
-                value={newRestaurantName}
-                onChange={(e) => setNewRestaurantName(e.target.value)}
+                placeholder="Ej: Sucursal Centro"
+                value={newBranchName}
+                onChange={(e) => setNewBranchName(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="description">Descripción</Label>
-              <Textarea
-                id="description"
-                placeholder="Describe tu restaurante..."
-                value={newRestaurantDescription}
-                onChange={(e) => setNewRestaurantDescription(e.target.value)}
-                rows={4}
+              <Label htmlFor="address">Dirección</Label>
+              <Input
+                id="address"
+                placeholder="Ej: Calle Falsa 123"
+                value={newBranchAddress}
+                onChange={(e) => setNewBranchAddress(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="phone">Teléfono</Label>
+              <Input
+                id="phone"
+                placeholder="Ej: +56912345678"
+                value={newBranchPhone}
+                onChange={(e) => setNewBranchPhone(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="schedule">Horario</Label>
+              <Input
+                id="schedule"
+                placeholder="Ej: Lun-Vie 09:00-18:00"
+                value={newBranchSchedule}
+                onChange={(e) => setNewBranchSchedule(e.target.value)}
               />
             </div>
           </div>
@@ -246,7 +308,77 @@ export default function BranchSelectionPage() {
             <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>
               Cancelar
             </Button>
-            <Button onClick={handleCreateRestaurant}>Crear</Button>
+            <Button
+              onClick={async () => {
+                if (!selectedRestaurantId) {
+                  alert('Selecciona un restaurante')
+                  return
+                }
+                if (!newBranchName.trim()) {
+                  alert('El nombre de la sucursal es obligatorio')
+                  return
+                }
+                try {
+                  await branchesApi.create({
+                    restaurantId: Number(selectedRestaurantId),
+                    name: newBranchName,
+                    address:
+                      newBranchAddress && newBranchAddress.trim() !== '' ? newBranchAddress : null,
+                    phone: newBranchPhone && newBranchPhone.trim() !== '' ? newBranchPhone : null,
+                    schedule:
+                      newBranchSchedule && newBranchSchedule.trim() !== ''
+                        ? newBranchSchedule
+                        : null,
+                  })
+                  setIsCreateModalOpen(false)
+                  setNewBranchName('')
+                  setNewBranchAddress('')
+                  setNewBranchPhone('')
+                  setNewBranchSchedule('')
+                  setSelectedRestaurantId('')
+                  setLoadingBranches(true)
+                  authApi
+                    .branches()
+                    .then((data) => {
+                      const stripPrefix = (branchName?: string, restName?: string) => {
+                        if (!branchName) return ''
+                        if (!restName) return branchName
+                        const trimmedRest = restName.trim()
+                        const trimmedBranch = branchName.trim()
+                        const separators = [' - ', ' – ', ' — ', ': ', ' -', '- ']
+                        for (const sep of separators) {
+                          const prefix = trimmedRest + sep
+                          if (trimmedBranch.startsWith(prefix))
+                            return trimmedBranch.slice(prefix.length).trim()
+                        }
+                        if (
+                          trimmedBranch.toLowerCase().startsWith(trimmedRest.toLowerCase() + ' ')
+                        ) {
+                          return trimmedBranch
+                            .slice(trimmedRest.length)
+                            .replace(/^[-–—:\s]+/, '')
+                            .trim()
+                        }
+                        return trimmedBranch
+                      }
+                      const mapped = data.map((b) => ({
+                        id: String(b.branch?.id ?? ''),
+                        restaurantId: b.restaurant?.id ? String(b.restaurant.id) : undefined,
+                        restaurantName: b.restaurant?.name ?? '',
+                        branchName: stripPrefix(b.branch?.name ?? '', b.restaurant?.name ?? ''),
+                      }))
+                      setBranches(mapped)
+                    })
+                    .catch((err) => console.warn('Failed to load branches', err))
+                    .finally(() => setLoadingBranches(false))
+                } catch (err) {
+                  alert('Error al crear la sucursal')
+                  console.warn('Error creating branch', err)
+                }
+              }}
+            >
+              Crear
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
