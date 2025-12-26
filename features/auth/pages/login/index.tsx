@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
 import { Spinner } from '@/components/ui/spinner'
 import { authApi } from '@/lib/api/auth'
+import { config } from '@/config'
 import { cn } from '@/lib/utils'
 
 export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) {
@@ -25,6 +26,17 @@ export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const mountedRef = useRef(true)
+
+  // Log de entorno al cargar la vista de Login
+  useEffect(() => {
+    const isProd = process.env.NODE_ENV === 'production'
+    const host = typeof window !== 'undefined' ? window.location.hostname : 'server'
+    console.log('[Qrio] Login iniciado', {
+      entorno: isProd ? 'producción' : 'local',
+      apiBaseUrl: config.api.baseUrl,
+      hostname: host,
+    })
+  }, [])
 
   const didRedirectRef = useRef(false)
   const pathname = usePathname()
