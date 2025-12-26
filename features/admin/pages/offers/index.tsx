@@ -1,16 +1,16 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 import { useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 
 import { OfferDialog } from '@admin/components/offers/offer-dialog'
 import { TableListLayout } from '@admin/components/shared/table-list-layout'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import { useListQuery } from '@/hooks/use-list-query'
 import { offersApi } from '@/lib/api/offers'
-import { useTenant } from '@/app/providers/tenant-provider'
 import type { OfferList } from '@/lib/schemas/offers/offers.list.schema'
 
 import { getColumns } from './columns'

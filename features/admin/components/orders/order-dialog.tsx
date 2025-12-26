@@ -6,6 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import { useTenant } from '@/app/providers/tenant-provider'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ComboBox } from '@/components/ui/combobox'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -20,9 +22,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { ordersApi } from '@/lib/api/orders'
-import { Badge } from '@/components/ui/badge'
 import { productsApi } from '@/lib/api/products'
-import { useTenant } from '@/app/providers/tenant-provider'
 
 const orderSchema = z.object({
   customerId: z.number().int().positive(),

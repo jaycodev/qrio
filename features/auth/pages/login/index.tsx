@@ -1,8 +1,9 @@
 'use client'
 
+import { useState } from 'react'
+
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -14,8 +15,8 @@ import {
   FieldSeparator,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
 import { authApi } from '@/lib/api/auth'
+import { cn } from '@/lib/utils'
 
 export function LoginPage({ className, ...props }: React.ComponentProps<'div'>) {
   const router = useRouter()

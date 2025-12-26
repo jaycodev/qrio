@@ -7,10 +7,10 @@ import { useForm } from 'react-hook-form'
 import { TableListLayout } from '@admin/components/shared/table-list-layout'
 import { TableDialog } from '@admin/components/tables/table-dialog'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import { Button } from '@/components/ui/button'
 import { useListQuery } from '@/hooks/use-list-query'
 import { tablesApi } from '@/lib/api/tables'
-import { useTenant } from '@/app/providers/tenant-provider'
 import type { DiningTableList } from '@/lib/schemas/table/table.list.schema'
 
 import { getColumns } from './columns'

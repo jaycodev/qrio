@@ -7,8 +7,8 @@ import { DataTableRowActions } from '@admin/components/data-table/data-table-row
 
 import { Badge } from '@/components/ui/badge'
 import type { EmployeeList } from '@/lib/schemas/employees/employee.list.schema'
-import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-header'
 import { withMetaLabelFilter } from '@/lib/utils/components/with-meta-label-filter'
+import { withMetaLabelHeader } from '@/lib/utils/components/with-meta-label-header'
 
 export const getColumns = (onEdit?: (emp: EmployeeList) => void): ColumnDef<EmployeeList>[] => {
   return [

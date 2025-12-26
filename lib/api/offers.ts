@@ -1,5 +1,5 @@
-import { OfferList, offerListSchema } from '@/lib/schemas/offers/offers.list.schema'
 import { OfferDetail, offerDetailSchema } from '@/lib/schemas/offers/offers.detail.schema'
+import { OfferList, offerListSchema } from '@/lib/schemas/offers/offers.list.schema'
 
 import { apiClient } from './client'
 

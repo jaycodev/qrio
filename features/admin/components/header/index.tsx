@@ -1,13 +1,13 @@
 'use client'
 
 import { Cloud, LogOut } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { authApi } from '@/lib/api/auth'
-import { useRouter } from 'next/navigation'
 
 import { Search } from './search'
 

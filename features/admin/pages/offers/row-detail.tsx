@@ -2,10 +2,10 @@
 
 import * as React from 'react'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import { Badge } from '@/components/ui/badge'
 import { offersApi } from '@/lib/api/offers'
 import { productsApi } from '@/lib/api/products'
-import { useTenant } from '@/app/providers/tenant-provider'
 import type { OfferList } from '@/lib/schemas/offers/offers.list.schema'
 
 interface Props {

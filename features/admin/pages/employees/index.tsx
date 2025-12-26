@@ -7,9 +7,9 @@ import { useQueryClient } from '@tanstack/react-query'
 import { EmployeeDialog } from '@admin/components/employees/employee-dialog'
 import { TableListLayout } from '@admin/components/shared/table-list-layout'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import { useListQuery } from '@/hooks/use-list-query'
 import { employeesApi } from '@/lib/api/employees'
-import { useTenant } from '@/app/providers/tenant-provider'
 import type { EmployeeList } from '@/lib/schemas/employees/employee.list.schema'
 
 import { getColumns } from './columns'

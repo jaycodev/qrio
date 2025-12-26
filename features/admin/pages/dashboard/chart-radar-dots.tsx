@@ -1,8 +1,9 @@
 'use client'
 
-import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from 'recharts'
 import { useQuery } from '@tanstack/react-query'
+import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from 'recharts'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   ChartConfig,
@@ -10,7 +11,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart'
-import { useTenant } from '@/app/providers/tenant-provider'
 import { tablesApi } from '@/lib/api/tables'
 
 type Datum = { floor: string; count: number }

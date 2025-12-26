@@ -5,8 +5,10 @@ import { useEffect, useRef, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Pencil, Trash, Upload } from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { useTenant } from '@/app/providers/tenant-provider'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -26,8 +28,6 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { showSubmittedData } from '@/lib/utils/components/show-submitted-data'
-import { toast } from 'sonner'
-import { useTenant } from '@/app/providers/tenant-provider'
 
 const photoSchema = z.object({
   photo: z

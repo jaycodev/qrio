@@ -6,6 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import { useTenant } from '@/app/providers/tenant-provider'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -18,8 +20,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
 import {
   Select,
   SelectContent,
@@ -27,9 +27,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { productsApi } from '@/lib/api/products'
-import { useTenant } from '@/app/providers/tenant-provider'
+import { Textarea } from '@/components/ui/textarea'
 import { offersApi } from '@/lib/api/offers'
+import { productsApi } from '@/lib/api/products'
 import type { OfferDetail } from '@/lib/schemas/offers/offers.detail.schema'
 
 type CatalogProduct = {

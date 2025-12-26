@@ -2,12 +2,12 @@
 
 import * as React from 'react'
 
+import type { MeResponse } from '@/lib/api/auth'
 import { authApi } from '@/lib/api/auth'
 import { branchesApi } from '@/lib/api/branches'
 import { restaurantsApi } from '@/lib/api/restaurants'
 import type { BranchList } from '@/lib/schemas/branches/branch.list.schema'
 import type { RestaurantDetail } from '@/lib/schemas/restaurants/restaurant.detail.schema'
-import type { MeResponse } from '@/lib/api/auth'
 
 type TenantState = {
   loading: boolean

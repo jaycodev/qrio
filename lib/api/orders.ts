@@ -1,9 +1,9 @@
+import { type OrderDetail, orderDetailSchema } from '@/lib/schemas/order/order.detail.schema'
 import {
   OrderFilterOptions,
   orderFilterOptionsSchema,
 } from '@/lib/schemas/order/order.filter.options.schema'
 import { type OrderList, orderListSchema } from '@/lib/schemas/order/order.list.schema'
-import { type OrderDetail, orderDetailSchema } from '@/lib/schemas/order/order.detail.schema'
 
 import { apiClient } from './client'
 
