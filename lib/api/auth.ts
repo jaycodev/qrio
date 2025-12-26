@@ -62,12 +62,11 @@ export const authApi = {
     return apiClient.get<UserBranchResponse[]>('/auth/branches')
   },
   async logout(): Promise<void> {
-    // Volver a llamar directamente al backend
-    // En producción puede devolver 401/403 por sesión expirada o CORS; no bloquear el flujo
-    try {
-      await apiClient.post('/auth/logout')
-    } catch (err) {
-      console.warn('[authApi.logout] Ignorando error de logout:', err)
+     if (typeof window !== 'undefined') {
+      const res = await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' })
+      if (!res.ok) throw new Error('Logout failed')
+      return
     }
+    await apiClient.post('/auth/logout')
   },
 }
