@@ -27,9 +27,21 @@ import { AddBranchDialog } from './add-branch-dialog'
 export function TeamSwitcher() {
   const { isMobile } = useSidebar()
   const tenant = useTenant()
+  const [cookieBranchId, setCookieBranchId] = React.useState<number | null>(null)
+
+  React.useEffect(() => {
+    if (typeof document === 'undefined') return
+    const m = document.cookie.match(/(?:^|; )branchId=([^;]+)/)
+    if (m) {
+      const v = Number(decodeURIComponent(m[1]))
+      if (!Number.isNaN(v)) setCookieBranchId(v)
+    }
+  }, [])
+
   const restaurantName = tenant.restaurant?.name ?? 'Restaurante'
   const branches = tenant.branches
-  const activeBranch = branches.find((b) => b.id === tenant.branchId) ?? branches[0]
+  const activeBranchId = cookieBranchId ?? tenant.branchId
+  const activeBranch = branches.find((b) => b.id === activeBranchId) ?? branches[0]
 
   const restaurantForActive =
     activeBranch?.restaurantName ?? tenant.restaurant?.name ?? 'Restaurante'
@@ -68,7 +80,7 @@ export function TeamSwitcher() {
             {branches.map((b) => (
               <DropdownMenuItem
                 key={b.id}
-                aria-current={b.id === tenant.branchId}
+                aria-current={b.id === activeBranchId}
                 onClick={async () => {
                   try {
                     const res = await fetch('/api/auth/set-branch', {
@@ -94,7 +106,7 @@ export function TeamSwitcher() {
                     window.location.assign('/admin')
                   } catch {}
                 }}
-                className={`gap-2 p-2 ${b.id === tenant.branchId ? 'bg-muted' : ''}`}
+                className={`gap-2 p-2 ${b.id === activeBranchId ? 'bg-muted' : ''}`}
               >
                 <div className="flex size-6 items-center justify-center rounded-sm border">
                   <ChefHat className="size-4 shrink-0" />
