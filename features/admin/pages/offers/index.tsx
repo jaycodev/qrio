@@ -76,9 +76,13 @@ export function OffersPage({ title, pathname, resource }: Props) {
           toggleExpand(offer.id)
         },
         async (offer) => {
-          await offersApi.updateActive(offer.id, !offer.active)
-          await queryClient.invalidateQueries({ queryKey: [resource] })
-          await queryClient.refetchQueries({ queryKey: [resource], type: 'active' })
+          try {
+            await offersApi.updateActive(offer.id, !offer.active)
+            await queryClient.invalidateQueries({ queryKey: [resource] })
+            await queryClient.refetchQueries({ queryKey: [resource], type: 'active' })
+          } catch (err) {
+            console.error('Failed to update offer active state for', offer.id, err)
+          }
         }
       ),
     [queryClient, resource]
