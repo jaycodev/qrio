@@ -17,10 +17,20 @@ async function forward(req: NextRequest) {
     if (contentType) headers['Content-Type'] = contentType
     headers['Cookie'] = req.headers.get('cookie') || ''
 
+    let fetchBody: BodyInit | undefined = undefined
+    if (!['GET', 'HEAD'].includes(req.method)) {
+      try {
+        const arr = await req.arrayBuffer()
+        fetchBody = arr
+      } catch {
+        fetchBody = undefined
+      }
+    }
+
     const backendRes = await fetch(target, {
       method: req.method,
       headers,
-      body: ['GET', 'HEAD'].includes(req.method) ? undefined : req.body,
+      body: fetchBody,
       redirect: 'manual',
     })
 
