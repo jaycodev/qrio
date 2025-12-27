@@ -38,8 +38,8 @@ export const offersApi = {
     const data = await apiClient.put(`${resource}/${id}`, payload)
     return offerListSchema.parse(data)
   },
-  async updateActive(id: number, active: boolean): Promise<OfferList> {
+  async updateActive(id: number, active: boolean): Promise<boolean> {
     const data = await apiClient.patch(`${resource}/${id}/active`, { active })
-    return offerListSchema.parse(data)
+    return Boolean(data)
   },
 }
